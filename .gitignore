@@ -1,0 +1,30 @@
+# Secrets and local account databases
+.env
+.env.*
+!.env.example
+*service-account*.json
+*.pem
+*.key
+*.db
+*.sqlite
+*.sqlite3
+*.db-*
+*.sqlite-*
+*.bak
+*.backup
+
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Frontend build/dependency artifacts
+node_modules/
+dist/
+dist-ssr/
+
+# Local editor/OS files
+.DS_Store
+.idea/
+.vscode/

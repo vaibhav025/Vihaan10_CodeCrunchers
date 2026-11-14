@@ -1,0 +1,100 @@
+{
+  "nps_overview": {
+    "full_name": "National Pension System",
+    "regulator": "PFRDA (Pension Fund Regulatory and Development Authority)",
+    "launch_year": 2004,
+    "eligibility": "Indian citizens aged 18-70",
+    "min_contribution_tier1": 500,
+    "min_annual_contribution_tier1": 1000,
+    "account_opening_amount": 1000,
+    "maturity_age": 60
+  },
+  "tax_benefits": {
+    "section_80ccd_1": {
+      "description": "Employee contribution deduction",
+      "limit": "10% of salary (included in 80C limit of ₹1.5 lakh)",
+      "for": "Salaried and self-employed"
+    },
+    "section_80ccd_1b": {
+      "description": "Additional exclusive NPS deduction",
+      "limit": 50000,
+      "for": "All NPS subscribers"
+    },
+    "section_80ccd_2": {
+      "description": "Employer contribution deduction",
+      "limit": "14% of salary for central govt, 10% for others",
+      "for": "Salaried employees only"
+    }
+  },
+  "tier_accounts": {
+    "tier_1": {
+      "type": "Pension Account",
+      "lock_in": "Exit eligibility depends on age, vesting period, subscriber model and current PFRDA rules; some eligible non-government normal exits may occur after a qualifying 15-year vesting period.",
+      "withdrawal": "25% for specific purposes after 3 years",
+      "maturity": "For eligible non-government normal exits effective 16 Dec 2025: up to 80% lump sum and at least 20% annuity, subject to corpus thresholds; tax treatment is separate."
+    },
+    "tier_2": {
+      "type": "Investment Account",
+      "lock_in": "None (except for govt employees)",
+      "withdrawal": "Anytime",
+      "tax_benefit": "Only for central govt employees"
+    }
+  },
+  "fund_managers": [
+    "SBI Pension Funds",
+    "LIC Pension Fund",
+    "UTI Retirement Solutions",
+    "HDFC Pension Management",
+    "ICICI Prudential Pension Funds",
+    "Kotak Mahindra Pension Fund",
+    "Aditya Birla Sun Life Pension Management",
+    "Tata Pension Management",
+    "Max Life Pension Fund Management",
+    "Axis Pension Fund Management"
+  ],
+  "asset_classes": {
+    "E": "Equity (up to 75% for Auto Choice)",
+    "C": "Corporate Bonds",
+    "G": "Government Securities",
+    "A": "Alternative Investment Funds"
+  },
+  "auto_choice_profiles": {
+    "LC75": {
+      "name": "Aggressive",
+      "equity_at_25": "75%",
+      "equity_at_55": "15%"
+    },
+    "LC50": {
+      "name": "Moderate",
+      "equity_at_25": "50%",
+      "equity_at_55": "10%"
+    },
+    "LC25": {
+      "name": "Conservative",
+      "equity_at_25": "25%",
+      "equity_at_55": "5%"
+    }
+  },
+  "faqs": [
+    {
+      "question": "What is the minimum contribution for NPS Tier I?",
+      "answer": "PFRDA lists ₹500 minimum per Tier I contribution and ₹1,000 minimum per year for the All Citizen Model. Check current rules for your NPS model."
+    },
+    {
+      "question": "Can I withdraw money from NPS before 60?",
+      "answer": "Partial withdrawal of up to 25% is allowed after 3 years for specific purposes like education, medical treatment, or home purchase."
+    },
+    {
+      "question": "What happens to NPS at age 60?",
+      "answer": "Eligible non-government normal exits can allow up to 80% lump sum and at least 20% annuity, subject to corpus thresholds and current rules. Tax treatment is separate."
+    },
+    {
+      "question": "How much tax can I save with NPS?",
+      "answer": "Tax deductions depend on tax regime. Under the old regime, 80CCD(1) and 80CCD(1B) may qualify subject to limits; under the new regime, personal contributions are not deductible, while eligible employer contribution under 80CCD(2) may qualify."
+    },
+    {
+      "question": "What is the expected return from NPS?",
+      "answer": "Historical returns have been 8-12% annually depending on asset allocation. Equity-heavy allocations tend to give higher returns over long periods."
+    }
+  ]
+}
