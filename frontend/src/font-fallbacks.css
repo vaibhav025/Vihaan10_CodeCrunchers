@@ -1,0 +1,36 @@
+/*
+ * Metric-matched fallbacks, used until the web fonts arrive, so text does not reflow on swap.
+ * Values measured against each font's Latin file (size-adjust from average advance width,
+ * ascent/descent from the font's own metrics). Limited to Latin so the rupee sign and
+ * Devanagari still fall through to Noto.
+ */
+@font-face {
+  font-family: 'Newsreader Fallback';
+  src: local('Georgia');
+  size-adjust: 101.13%; ascent-override: 73.17%; descent-override: 25.71%; line-gap-override: 0%;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: 'Newsreader Fallback';
+  font-style: italic;
+  src: local('Georgia Italic'), local('Georgia-Italic');
+  size-adjust: 93.56%; ascent-override: 79.09%; descent-override: 27.79%; line-gap-override: 0%;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: 'Geist Fallback';
+  src: local('Arial'), local('ArialMT');
+  size-adjust: 102.04%; ascent-override: 98.98%; descent-override: 28.42%; line-gap-override: 0%;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: 'Plex Mono Fallback';
+  src: local('Courier New'), local('CourierNewPSMT');
+  size-adjust: 99.98%; ascent-override: 102.02%; descent-override: 27%; line-gap-override: 0%;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial'), local('Helvetica Neue');
+  size-adjust: 104.6%; ascent-override: 94.8%; descent-override: 29.6%; line-gap-override: 0%;
+}

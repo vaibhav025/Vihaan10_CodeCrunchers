@@ -1,0 +1,1061 @@
+{
+ "id": 1,
+ "name": {
+  "en": "Money Basics",
+  "hi": "पैसे की बुनियाद",
+  "mr": "पैशाची मूलतत्त्वे"
+ },
+ "tagline": {
+  "en": "Earn it, keep it, grow it.",
+  "hi": "कमाएँ, बचाएँ, बढ़ाएँ।",
+  "mr": "कमवा, वाचवा, वाढवा."
+ },
+ "stages": [
+  {
+   "order": 1,
+   "title": {
+    "en": "Welcome walk",
+    "hi": "पहली सैर",
+    "mr": "पहिली फेरी"
+   },
+   "learningGoal": {
+    "en": "Learn the controls and meet Future You.",
+    "hi": "नियंत्रण सीखें और भविष्य के आप से मिलें।",
+    "mr": "नियंत्रणे शिका आणि भविष्यातील तुम्हाला भेटा."
+   },
+   "successCriteria": "Reach the flag.",
+   "params": {
+    "mode": "tutorial",
+    "seconds": 18,
+    "traps": {
+     "en": "Puddle|Pothole",
+     "hi": "गड्ढा|कीचड़",
+     "mr": "खड्डा|चिखल"
+    }
+   },
+   "id": "w1-1",
+   "world": 1,
+   "engine": "runner",
+   "difficulty": 1,
+   "insightKey": "w1_1",
+   "deepDiveKey": "w1_1"
+  },
+  {
+   "order": 2,
+   "title": {
+    "en": "Coins vs Bills",
+    "hi": "सिक्के बनाम बिल",
+    "mr": "नाणी विरुद्ध बिले"
+   },
+   "learningGoal": {
+    "en": "What you keep is income minus expenses.",
+    "hi": "जो बचता है वह आय घटा खर्च है।",
+    "mr": "जे उरते ते उत्पन्न वजा खर्च."
+   },
+   "successCriteria": "Finish with more coins than bills took.",
+   "params": {
+    "mode": "bills",
+    "seconds": 28,
+    "traps": {
+     "en": "Rent|Bills|EMI|Fees",
+     "hi": "किराया|बिल|EMI|शुल्क",
+     "mr": "भाडे|बिले|EMI|शुल्क"
+    }
+   },
+   "id": "w1-2",
+   "world": 1,
+   "engine": "runner",
+   "difficulty": 1,
+   "insightKey": "w1_2",
+   "deepDiveKey": "w1_2"
+  },
+  {
+   "order": 3,
+   "title": {
+    "en": "Inflation Road",
+    "hi": "महँगाई मार्ग",
+    "mr": "महागाई मार्ग"
+   },
+   "learningGoal": {
+    "en": "Idle money loses buying power every year.",
+    "hi": "पड़ा पैसा हर साल क्रय शक्ति खोता है।",
+    "mr": "पडून राहिलेला पैसा दरवर्षी क्रयशक्ती गमावतो."
+   },
+   "successCriteria": "Cross before the note loses half its value.",
+   "params": {
+    "mode": "inflation",
+    "lanes": {
+     "en": "Prices|Rent|Fuel|Groceries",
+     "hi": "दाम|किराया|ईंधन|राशन",
+     "mr": "किमती|भाडे|इंधन|किराणा"
+    }
+   },
+   "id": "w1-3",
+   "world": 1,
+   "engine": "hopper",
+   "difficulty": 1,
+   "insightKey": "w1_3",
+   "deepDiveKey": "w1_3"
+  },
+  {
+   "order": 4,
+   "title": {
+    "en": "First Paycheck",
+    "hi": "पहला वेतन",
+    "mr": "पहिला पगार"
+   },
+   "learningGoal": {
+    "en": "The same ₹5,000 a month ends very differently by choice.",
+    "hi": "वही ₹5,000 महीना, चुनाव से नतीजा अलग।",
+    "mr": "तेच ₹5,000 दरमहा, निवडीनुसार निकाल वेगळा."
+   },
+   "successCriteria": "Pick a pipe and watch 30 years play out.",
+   "params": {
+    "q": {
+     "en": "Your first paycheck. ₹{m} a month is left over. Where does it go?",
+     "hi": "आपकी पहली तनख़्वाह। ₹{m} महीना बचता है। कहाँ जाए?",
+     "mr": "तुमचा पहिला पगार. ₹{m} दरमहा उरतात. कुठे जावेत?"
+    },
+    "monthly": 5000,
+    "startAge": 25,
+    "retireAge": 55,
+    "options": [
+     {
+      "label": {
+       "en": "Spend it: new phone, every month",
+       "hi": "खर्च करें: हर महीने नया फ़ोन",
+       "mr": "खर्च करा: दर महिन्याला नवा फोन"
+      },
+      "outcome": {
+       "en": "Future You owns 30 phones and one very loud drawer.",
+       "hi": "भविष्य के आप के पास 30 फ़ोन और एक बहुत शोर वाली दराज़ है।",
+       "mr": "भविष्यातील तुमच्याकडे 30 फोन आणि एक गोंगाट करणारा ड्रॉवर आहे."
+      },
+      "rate": null,
+      "stars": 1
+     },
+     {
+      "label": {
+       "en": "Savings account at 4%",
+       "hi": "4% पर बचत खाता",
+       "mr": "4% वर बचत खाते"
+      },
+      "outcome": {
+       "en": "Safe and sleepy. Prices grew almost as fast as it did.",
+       "hi": "सुरक्षित और सुस्त। दाम लगभग उतनी ही तेज़ी से बढ़े।",
+       "mr": "सुरक्षित आणि सुस्त. किमतीही जवळजवळ तितक्याच वेगाने वाढल्या."
+      },
+      "rate": 4,
+      "stars": 2
+     },
+     {
+      "label": {
+       "en": "Invest it at 10%",
+       "hi": "10% पर निवेश करें",
+       "mr": "10% वर गुंतवा"
+      },
+      "outcome": {
+       "en": "Future You just bought chai for the whole street.",
+       "hi": "भविष्य के आप ने अभी पूरी गली को चाय पिलाई।",
+       "mr": "भविष्यातील तुम्ही नुकताच संपूर्ण गल्लीला चहा पाजला."
+      },
+      "rate": 10,
+      "stars": 3
+     }
+    ]
+   },
+   "calculatorLink": "POST /api/simulator/calculate (projected_corpus at 4% and 10%, age 25 to 55)",
+   "id": "w1-4",
+   "world": 1,
+   "engine": "fork",
+   "difficulty": 2,
+   "insightKey": "w1_4",
+   "deepDiveKey": "w1_4"
+  },
+  {
+   "order": 5,
+   "title": {
+    "en": "Lifestyle Creep",
+    "hi": "बढ़ती जीवनशैली",
+    "mr": "वाढती जीवनशैली"
+   },
+   "learningGoal": {
+    "en": "Spending that rises with every raise leaves nothing extra to save.",
+    "hi": "हर वेतन-वृद्धि के साथ बढ़ता खर्च बचत नहीं बढ़ने देता।",
+    "mr": "प्रत्येक पगारवाढीसोबत वाढणारा खर्च बचत वाढू देत नाही."
+   },
+   "successCriteria": "Reach the flag as the pace climbs.",
+   "params": {
+    "mode": "creep",
+    "seconds": 30,
+    "traps": {
+     "en": "New phone|Bigger flat|Upgrade|Subscriptions",
+     "hi": "नया फ़ोन|बड़ा घर|अपग्रेड|सब्सक्रिप्शन",
+     "mr": "नवा फोन|मोठे घर|अपग्रेड|सबस्क्रिप्शन"
+    }
+   },
+   "id": "w1-5",
+   "world": 1,
+   "engine": "runner",
+   "difficulty": 2,
+   "insightKey": "w1_5",
+   "deepDiveKey": "w1_5",
+   "reward": "chest"
+  },
+  {
+   "order": 6,
+   "title": {
+    "en": "Compounding Hill",
+    "hi": "चक्रवृद्धि की पहाड़ी",
+    "mr": "चक्रवाढीची टेकडी"
+   },
+   "learningGoal": {
+    "en": "Growth earns growth, so starting earlier matters more than starting bigger.",
+    "hi": "बढ़त पर बढ़त मिलती है, इसलिए जल्दी शुरू करना बड़ा शुरू करने से ज़्यादा मायने रखता है।",
+    "mr": "वाढीवर वाढ मिळते, म्हणून मोठ्यापेक्षा लवकर सुरुवात महत्त्वाची."
+   },
+   "successCriteria": "Reach the bottom of the hill.",
+   "params": {
+    "seconds": 26,
+    "monthly": 3000,
+    "rate": 10
+   },
+   "id": "w1-6",
+   "world": 1,
+   "engine": "snowball",
+   "difficulty": 2,
+   "insightKey": "w1_7",
+   "deepDiveKey": "w1_7",
+   "calculatorLink": "POST /api/simulator/calculate (corpus at 60 by starting age)"
+  },
+  {
+   "order": 7,
+   "title": {
+    "en": "Needs vs Wants",
+    "hi": "ज़रूरत बनाम चाहत",
+    "mr": "गरज विरुद्ध हौस"
+   },
+   "learningGoal": {
+    "en": "Sort money into the right bucket: needs, safety, tax and debt.",
+    "hi": "पैसे को सही बकेट में रखें: ज़रूरत, सुरक्षा, कर और कर्ज़।",
+    "mr": "पैसा योग्य बादलीत ठेवा: गरज, सुरक्षा, कर आणि कर्ज."
+   },
+   "successCriteria": "Sort every item.",
+   "params": {
+    "rounds": [
+     {
+      "bins": [
+       {
+        "en": "Need",
+        "hi": "ज़रूरत",
+        "mr": "गरज"
+       },
+       {
+        "en": "Want",
+        "hi": "चाहत",
+        "mr": "हौस"
+       }
+      ],
+      "items": [
+       {
+        "n": {
+         "en": "Rent",
+         "hi": "किराया",
+         "mr": "भाडे"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "Food delivery, again",
+         "hi": "फिर से फ़ूड डिलीवरी",
+         "mr": "पुन्हा फूड डिलिव्हरी"
+        },
+        "b": 1
+       },
+       {
+        "n": {
+         "en": "Electricity bill",
+         "hi": "बिजली का बिल",
+         "mr": "वीज बिल"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "Fourth pair of sneakers",
+         "hi": "चौथी जोड़ी स्नीकर्स",
+         "mr": "स्नीकर्सची चौथी जोडी"
+        },
+        "b": 1
+       }
+      ]
+     },
+     {
+      "bins": [
+       {
+        "en": "Emergency fund",
+        "hi": "आपात कोष",
+        "mr": "आपत्कालीन निधी"
+       },
+       {
+        "en": "Investment",
+        "hi": "निवेश",
+        "mr": "गुंतवणूक"
+       }
+      ],
+      "items": [
+       {
+        "n": {
+         "en": "A sudden hospital visit",
+         "hi": "अचानक अस्पताल जाना",
+         "mr": "अचानक रुग्णालय भेट"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "Retirement in 30 years",
+         "hi": "30 साल बाद रिटायरमेंट",
+         "mr": "30 वर्षांनी निवृत्ती"
+        },
+        "b": 1
+       },
+       {
+        "n": {
+         "en": "Rent if the job goes",
+         "hi": "नौकरी जाए तो किराया",
+         "mr": "नोकरी गेल्यास भाडे"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "A child's college in 15 years",
+         "hi": "15 साल बाद बच्चे का कॉलेज",
+         "mr": "15 वर्षांनी मुलाचे कॉलेज"
+        },
+        "b": 1
+       }
+      ]
+     },
+     {
+      "bins": [
+       {
+        "en": "80C",
+        "hi": "80C",
+        "mr": "80C"
+       },
+       {
+        "en": "80CCD(1B)",
+        "hi": "80CCD(1B)",
+        "mr": "80CCD(1B)"
+       }
+      ],
+      "items": [
+       {
+        "n": {
+         "en": "PPF deposit",
+         "hi": "PPF जमा",
+         "mr": "PPF ठेव"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "Extra NPS contribution, beyond 80C",
+         "hi": "80C के ऊपर अतिरिक्त NPS योगदान",
+         "mr": "80C पलीकडे अतिरिक्त NPS योगदान"
+        },
+        "b": 1
+       },
+       {
+        "n": {
+         "en": "ELSS mutual fund",
+         "hi": "ELSS म्यूचुअल फ़ंड",
+         "mr": "ELSS म्युच्युअल फंड"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "Life insurance premium",
+         "hi": "जीवन बीमा प्रीमियम",
+         "mr": "जीवन विमा हप्ता"
+        },
+        "b": 0
+       }
+      ]
+     },
+     {
+      "bins": [
+       {
+        "en": "Good debt",
+        "hi": "अच्छा कर्ज़",
+        "mr": "चांगले कर्ज"
+       },
+       {
+        "en": "Bad debt",
+        "hi": "बुरा कर्ज़",
+        "mr": "वाईट कर्ज"
+       }
+      ],
+      "items": [
+       {
+        "n": {
+         "en": "Education loan for a skill",
+         "hi": "हुनर के लिए शिक्षा ऋण",
+         "mr": "कौशल्यासाठी शैक्षणिक कर्ज"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "Credit card balance rolled over",
+         "hi": "क्रेडिट कार्ड का बकाया आगे बढ़ाया",
+         "mr": "क्रेडिट कार्डची थकबाकी पुढे ढकलली"
+        },
+        "b": 1
+       },
+       {
+        "n": {
+         "en": "Home loan within budget",
+         "hi": "बजट में होम लोन",
+         "mr": "बजेटमधील गृहकर्ज"
+        },
+        "b": 0
+       },
+       {
+        "n": {
+         "en": "Personal loan for a holiday",
+         "hi": "छुट्टी के लिए पर्सनल लोन",
+         "mr": "सुट्टीसाठी वैयक्तिक कर्ज"
+        },
+        "b": 1
+       }
+      ]
+     }
+    ]
+   },
+   "id": "w1-7",
+   "world": 1,
+   "engine": "sorter",
+   "difficulty": 2,
+   "insightKey": "w1_6",
+   "deepDiveKey": "w1_6",
+   "sourceUrl": "https://incometaxindia.gov.in/Pages/tools/deduction-under-section-80c-to-80u.aspx",
+   "lastReviewed": "2026-06 (model knowledge; needs human check against the current Finance Act)"
+  },
+  {
+   "id": "w1-8",
+   "world": 1,
+   "order": 8,
+   "engine": "spotter",
+   "difficulty": 3,
+   "title": {
+    "en": "Spot the Scam",
+    "hi": "ठगी पहचानें",
+    "mr": "घोटाळा ओळखा"
+   },
+   "learningGoal": {
+    "en": "Urgency, prizes, PINs and guarantees are the four loudest scam signals.",
+    "hi": "जल्दबाज़ी, इनाम, PIN और गारंटी ठगी के चार सबसे बड़े संकेत हैं।",
+    "mr": "घाई, बक्षीस, PIN आणि हमी हे घोटाळ्याचे चार मोठे संकेत."
+   },
+   "successCriteria": "Find the suspicious parts in three messages.",
+   "insightKey": "w1_8",
+   "deepDiveKey": "w1_8",
+   "params": {
+    "scenes": [
+     {
+      "kind": "sms",
+      "from": {
+       "en": "VM-KYCUPD",
+       "hi": "VM-KYCUPD",
+       "mr": "VM-KYCUPD"
+      },
+      "seconds": 16,
+      "parts": [
+       {
+        "t": {
+         "en": "Dear customer, your",
+         "hi": "प्रिय ग्राहक, आपका",
+         "mr": "प्रिय ग्राहक, तुमचे"
+        }
+       },
+       {
+        "t": {
+         "en": "KYC expires TODAY.",
+         "hi": "KYC आज ही ख़त्म हो रहा है।",
+         "mr": "KYC आजच संपत आहे."
+        },
+        "bad": true,
+        "why": {
+         "en": "False urgency: banks give notice, not a same-day deadline.",
+         "hi": "झूठी जल्दबाज़ी: बैंक पहले सूचना देते हैं, उसी दिन की समय सीमा नहीं।",
+         "mr": "खोटी घाई: बँका आधी सूचना देतात, त्याच दिवशीची मुदत नाही."
+        }
+       },
+       {
+        "t": {
+         "en": "Update at",
+         "hi": "अपडेट करें",
+         "mr": "अपडेट करा"
+        }
+       },
+       {
+        "t": {
+         "en": "bit.ly/kyc-upd8",
+         "hi": "bit.ly/kyc-upd8",
+         "mr": "bit.ly/kyc-upd8"
+        },
+        "bad": true,
+        "why": {
+         "en": "A shortened link hides where it goes. Use the official app.",
+         "hi": "छोटा लिंक असली पता छिपाता है। आधिकारिक ऐप इस्तेमाल करें।",
+         "mr": "लहान लिंक खरा पत्ता लपवते. अधिकृत अ‍ॅप वापरा."
+        }
+       },
+       {
+        "t": {
+         "en": "and share the OTP with our agent.",
+         "hi": "और हमारे एजेंट को OTP बताएँ।",
+         "mr": "आणि आमच्या एजंटला OTP सांगा."
+        },
+        "bad": true,
+        "why": {
+         "en": "No real bank asks for your OTP. Ever.",
+         "hi": "कोई असली बैंक OTP नहीं माँगता। कभी नहीं।",
+         "mr": "कोणतीही खरी बँक OTP मागत नाही. कधीच नाही."
+        }
+       }
+      ]
+     },
+     {
+      "kind": "upi",
+      "from": {
+       "en": "prizedesk@okpay",
+       "hi": "prizedesk@okpay",
+       "mr": "prizedesk@okpay"
+      },
+      "seconds": 14,
+      "parts": [
+       {
+        "t": {
+         "en": "Congratulations!",
+         "hi": "बधाई हो!",
+         "mr": "अभिनंदन!"
+        }
+       },
+       {
+        "t": {
+         "en": "You won ₹50,000.",
+         "hi": "आपने ₹50,000 जीते।",
+         "mr": "तुम्ही ₹50,000 जिंकले."
+        },
+        "bad": true,
+        "why": {
+         "en": "A prize you never entered is bait.",
+         "hi": "जिस इनाम में आपने हिस्सा ही नहीं लिया, वह चारा है।",
+         "mr": "ज्यात भाग घेतला नाही ते बक्षीस म्हणजे आमिष."
+        }
+       },
+       {
+        "t": {
+         "en": "Approve this request and",
+         "hi": "यह अनुरोध मंज़ूर करें और",
+         "mr": "ही विनंती मंजूर करा आणि"
+        }
+       },
+       {
+        "t": {
+         "en": "enter your UPI PIN to receive it.",
+         "hi": "पैसे पाने के लिए UPI PIN डालें।",
+         "mr": "पैसे मिळवण्यासाठी UPI PIN टाका."
+        },
+        "bad": true,
+        "why": {
+         "en": "A UPI PIN is only for paying. You never need it to receive money.",
+         "hi": "UPI PIN सिर्फ़ भुगतान के लिए है। पैसे पाने के लिए कभी नहीं।",
+         "mr": "UPI PIN फक्त पैसे देण्यासाठी. पैसे मिळवण्यासाठी कधीच नाही."
+        }
+       }
+      ]
+     },
+     {
+      "kind": "statement",
+      "from": {
+       "en": "Growth Fund, Direct plan",
+       "hi": "ग्रोथ फ़ंड, डायरेक्ट प्लान",
+       "mr": "ग्रोथ फंड, डायरेक्ट प्लॅन"
+      },
+      "seconds": 16,
+      "parts": [
+       {
+        "t": {
+         "en": "NAV as on 31 March.",
+         "hi": "31 मार्च की NAV।",
+         "mr": "31 मार्चची NAV."
+        }
+       },
+       {
+        "t": {
+         "en": "Guaranteed returns of 24% a year.",
+         "hi": "24% सालाना की गारंटीड रिटर्न।",
+         "mr": "वर्षाला 24% हमखास परतावा."
+        },
+        "bad": true,
+        "why": {
+         "en": "Market-linked funds cannot guarantee returns.",
+         "hi": "बाज़ार से जुड़े फ़ंड रिटर्न की गारंटी नहीं दे सकते।",
+         "mr": "बाजाराशी जोडलेले फंड परताव्याची हमी देऊ शकत नाहीत."
+        }
+       },
+       {
+        "t": {
+         "en": "Exit load: 1% if redeemed within a year.",
+         "hi": "एग्ज़िट लोड: साल भर में निकालने पर 1%।",
+         "mr": "एक्झिट लोड: वर्षभरात काढल्यास 1%."
+        }
+       },
+       {
+        "t": {
+         "en": "Pay the next instalment to the agent's personal account.",
+         "hi": "अगली किस्त एजेंट के निजी खाते में भेजें।",
+         "mr": "पुढचा हप्ता एजंटच्या वैयक्तिक खात्यात भरा."
+        },
+        "bad": true,
+        "why": {
+         "en": "Payments go to the fund house, never to a person.",
+         "hi": "भुगतान फ़ंड हाउस को जाता है, किसी व्यक्ति को नहीं।",
+         "mr": "पैसे फंड हाऊसला जातात, व्यक्तीला कधीच नाही."
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "order": 9,
+   "title": {
+    "en": "Plant your NPS tree",
+    "hi": "अपना NPS पेड़ लगाएँ",
+    "mr": "तुमचे NPS झाड लावा"
+   },
+   "learningGoal": {
+    "en": "NPS is a pension account, and 80CCD(1B) gives an extra ₹50,000 deduction.",
+    "hi": "NPS पेंशन खाता है, और 80CCD(1B) अतिरिक्त ₹50,000 कटौती देता है।",
+    "mr": "NPS हे पेन्शन खाते आहे, आणि 80CCD(1B) अतिरिक्त ₹50,000 वजावट देते."
+   },
+   "successCriteria": "Help the gardener plant the tree.",
+   "params": {
+    "q": {
+     "en": "Meet the NPS sapling. ₹{m} a month until 60. When do you plant it?",
+     "hi": "NPS पौधे से मिलिए। 60 तक ₹{m} महीना। कब लगाएँगे?",
+     "mr": "NPS रोपाला भेटा. 60 पर्यंत ₹{m} दरमहा. कधी लावाल?"
+    },
+    "monthly": 2000,
+    "startAge": 25,
+    "retireAge": 60,
+    "facts": [
+     {
+      "en": "NPS is a voluntary, long-term retirement scheme regulated by PFRDA.",
+      "hi": "NPS, PFRDA द्वारा नियंत्रित एक स्वैच्छिक, लंबी अवधि की रिटायरमेंट योजना है।",
+      "mr": "NPS ही PFRDA द्वारे नियंत्रित स्वैच्छिक, दीर्घकालीन निवृत्ती योजना आहे."
+     },
+     {
+      "en": "Under Section 80CCD(1B), NPS contributions of up to ₹50,000 a year can be deducted, over and above 80C (old tax regime).",
+      "hi": "धारा 80CCD(1B) के तहत NPS में सालाना ₹50,000 तक का योगदान 80C के ऊपर घटाया जा सकता है (पुरानी कर व्यवस्था)।",
+      "mr": "कलम 80CCD(1B) अंतर्गत NPS मधील वर्षाला ₹50,000 पर्यंतचे योगदान 80C च्या वर वजा करता येते (जुनी कर प्रणाली)."
+     }
+    ],
+    "options": [
+     {
+      "label": {
+       "en": "Plant it now, at 25",
+       "hi": "अभी लगाएँ, 25 पर",
+       "mr": "आता लावा, 25 व्या वर्षी"
+      },
+      "outcome": {
+       "en": "By 60 it is a shady tree. Future You naps under it.",
+       "hi": "60 तक यह छायादार पेड़ है। भविष्य के आप इसके नीचे झपकी लेते हैं।",
+       "mr": "60 पर्यंत हे सावलीचे झाड आहे. भविष्यातील तुम्ही त्याखाली डुलकी घेता."
+      },
+      "rate": 9,
+      "age": 25,
+      "stars": 3
+     },
+     {
+      "label": {
+       "en": "Plant it later, at 35",
+       "hi": "बाद में लगाएँ, 35 पर",
+       "mr": "नंतर लावा, 35 व्या वर्षी"
+      },
+      "outcome": {
+       "en": "A decent tree. Smaller, but it still gives shade.",
+       "hi": "ठीक-ठाक पेड़। छोटा, पर छाया देता है।",
+       "mr": "बरे झाड. लहान, पण सावली देते."
+      },
+      "rate": 9,
+      "age": 35,
+      "stars": 2
+     },
+     {
+      "label": {
+       "en": "Skip the sapling",
+       "hi": "पौधा छोड़ दें",
+       "mr": "रोप सोडून द्या"
+      },
+      "outcome": {
+       "en": "Future You stands in the sun, holding an umbrella made of hope.",
+       "hi": "भविष्य के आप धूप में खड़े हैं, उम्मीद की छतरी लिए।",
+       "mr": "भविष्यातील तुम्ही उन्हात उभे आहात, आशेची छत्री घेऊन."
+      },
+      "rate": null,
+      "stars": 1
+     }
+    ]
+   },
+   "id": "w1-9",
+   "world": 1,
+   "engine": "fork",
+   "difficulty": 3,
+   "insightKey": "w1_9",
+   "deepDiveKey": "w1_9",
+   "sourceUrl": "https://www.pfrda.org.in",
+   "lastReviewed": "2026-06 (model knowledge; needs human check against the current Finance Act)",
+   "calculatorLink": "POST /api/simulator/calculate (₹2,000 a month at an assumed 9%, start at 25 or 35, until 60)",
+   "unverified": [
+    "80CCD(1B) applies under the old tax regime only; confirm the limit and regime rules for the current year"
+   ]
+  },
+  {
+   "order": 10,
+   "title": {
+    "en": "Stress Test",
+    "hi": "तनाव परीक्षा",
+    "mr": "ताण चाचणी"
+   },
+   "learningGoal": {
+    "en": "Different storms need different shields: cash, cover and spread.",
+    "hi": "अलग तूफ़ानों के लिए अलग ढालें: नक़दी, बीमा और फैलाव।",
+    "mr": "वेगवेगळ्या वादळांना वेगळ्या ढाली: रोकड, विमा आणि विभागणी."
+   },
+   "successCriteria": "Survive six months without income.",
+   "params": {
+    "tokens": 8,
+    "needs": {
+     "ef": 4,
+     "ins": 2,
+     "div": 2
+    }
+   },
+   "calculatorLink": "Tracker: liquid savings and monthly expenses",
+   "id": "w1-10",
+   "world": 1,
+   "engine": "boss",
+   "difficulty": 3,
+   "insightKey": "w1_10",
+   "deepDiveKey": "w1_10",
+   "reward": "mega"
+  }
+ ],
+ "lessons": {
+  "w1_1": {
+   "insight": {
+    "en": "Every rupee you pick up today is one Future You gets to spend.",
+    "hi": "आज उठाया हर रुपया भविष्य का आप खर्च करेगा।",
+    "mr": "आज उचललेला प्रत्येक रुपया भविष्यातील तुम्ही खर्च कराल."
+   },
+   "steps": [
+    {
+     "en": "Every rupee you keep today is a rupee Future You can spend.",
+     "hi": "आज रखा हर रुपया भविष्य के आप खर्च कर सकेंगे।",
+     "mr": "आज ठेवलेला प्रत्येक रुपया भविष्यातील तुम्ही खर्च करू शकाल."
+    },
+    {
+     "en": "Saving is just moving money from now to later.",
+     "hi": "बचत बस पैसे को अभी से बाद में ले जाना है।",
+     "mr": "बचत म्हणजे पैसे आतून नंतरकडे नेणे."
+    },
+    {
+     "en": "Small, regular amounts beat rare big ones.",
+     "hi": "छोटी, नियमित रकम कभी-कभार बड़ी रकम से बेहतर है।",
+     "mr": "लहान, नियमित रक्कम कधीतरीच्या मोठ्या रकमेपेक्षा चांगली."
+    }
+   ],
+   "example": {
+    "en": "₹100 a week is ₹5,200 a year, before any growth.",
+    "hi": "₹100 हर हफ़्ते = साल में ₹5,200, बढ़त से पहले।",
+    "mr": "दर आठवड्याला ₹100 = वर्षाला ₹5,200, वाढीपूर्वी."
+   }
+  },
+  "w1_2": {
+   "insight": {
+    "en": "Earning more helps. Keeping more is what counts.",
+    "hi": "ज़्यादा कमाना मदद करता है। ज़्यादा बचाना मायने रखता है।",
+    "mr": "जास्त कमावणे मदत करते. जास्त वाचवणे महत्त्वाचे."
+   },
+   "steps": [
+    {
+     "en": "Income is what comes in. Expenses are what goes out.",
+     "hi": "आय जो आती है। खर्च जो जाता है।",
+     "mr": "उत्पन्न जे येते. खर्च जो जातो."
+    },
+    {
+     "en": "Savings are only what is left between the two.",
+     "hi": "बचत बस दोनों के बीच का बचा हिस्सा है।",
+     "mr": "बचत म्हणजे दोन्हींच्या मधले उरलेले."
+    },
+    {
+     "en": "Pay yourself first: move savings out on payday.",
+     "hi": "पहले ख़ुद को दें: तनख़्वाह के दिन बचत अलग करें।",
+     "mr": "आधी स्वतःला द्या: पगाराच्या दिवशी बचत बाजूला करा."
+    }
+   ],
+   "example": {
+    "en": "Earn ₹30,000, spend ₹27,000: you save ₹3,000, or 10%.",
+    "hi": "₹30,000 कमाएँ, ₹27,000 खर्च: ₹3,000 यानी 10% बचत।",
+    "mr": "₹30,000 कमवा, ₹27,000 खर्च: ₹3,000 म्हणजे 10% बचत."
+   }
+  },
+  "w1_3": {
+   "insight": {
+    "en": "At 6% inflation, ₹100 buys what ₹56 does today in ten years. Money has to move to keep up.",
+    "hi": "6% महँगाई पर दस साल में ₹100 आज के ₹56 जितना ख़रीदेगा। पैसे को चलते रहना होगा।",
+    "mr": "6% महागाईत दहा वर्षांनी ₹100 आजच्या ₹56 इतकेच खरेदी करेल. पैशाला चालत राहावे लागते."
+   },
+   "steps": [
+    {
+     "en": "Inflation means the same rupee buys a little less each year.",
+     "hi": "महँगाई का मतलब है वही रुपया हर साल थोड़ा कम ख़रीदता है।",
+     "mr": "महागाई म्हणजे तोच रुपया दरवर्षी थोडे कमी विकत घेतो."
+    },
+    {
+     "en": "Cash under the mattress loses buying power quietly.",
+     "hi": "गद्दे के नीचे नक़दी चुपचाप क्रय शक्ति खोती है।",
+     "mr": "गादीखालची रोकड शांतपणे क्रयशक्ती गमावते."
+    },
+    {
+     "en": "To stand still, money must grow at least as fast as prices.",
+     "hi": "बराबर रहने के लिए पैसा कम से कम दामों जितना बढ़ना चाहिए।",
+     "mr": "जागी राहण्यासाठी पैसा किमान किमतींइतका वाढला पाहिजे."
+    }
+   ],
+   "example": {
+    "en": "At 6% inflation, prices double in about 72 ÷ 6 = 12 years.",
+    "hi": "6% महँगाई पर दाम लगभग 72 ÷ 6 = 12 साल में दोगुने।",
+    "mr": "6% महागाईवर किमती सुमारे 72 ÷ 6 = 12 वर्षांत दुप्पट."
+   }
+  },
+  "w1_4": {
+   "insight": {
+    "en": "Where your first salary goes sets a habit for decades.",
+    "hi": "पहली तनख़्वाह कहाँ जाती है, यह दशकों की आदत बनाता है।",
+    "mr": "पहिला पगार कुठे जातो, ती दशकांची सवय बनते."
+   },
+   "steps": [
+    {
+     "en": "Spending gives joy now and nothing later.",
+     "hi": "खर्च अभी ख़ुशी देता है, बाद में कुछ नहीं।",
+     "mr": "खर्च आता आनंद देतो, नंतर काही नाही."
+    },
+    {
+     "en": "Saving keeps money safe but slow.",
+     "hi": "बचत पैसे को सुरक्षित पर धीमा रखती है।",
+     "mr": "बचत पैसा सुरक्षित पण संथ ठेवते."
+    },
+    {
+     "en": "Investing for the long run lets growth do the heavy lifting.",
+     "hi": "लंबे समय का निवेश बढ़त को भारी काम करने देता है।",
+     "mr": "दीर्घकालीन गुंतवणूक वाढीला मोठे काम करू देते."
+    }
+   ],
+   "example": {
+    "en": "The three bars you saw came from the calculator for ₹5,000 a month, age 25 to 55.",
+    "hi": "जो तीन बार देखे वे ₹5,000 महीना, 25 से 55 उम्र के लिए कैलकुलेटर से थे।",
+    "mr": "पाहिलेले तीन बार ₹5,000 दरमहा, वय 25 ते 55 साठी कॅल्क्युलेटरमधून होते."
+   }
+  },
+  "w1_5": {
+   "insight": {
+    "en": "The upgrades got faster as you earned more. That is lifestyle creep.",
+    "hi": "जैसे-जैसे कमाई बढ़ी, अपग्रेड तेज़ होते गए। यही लाइफ़स्टाइल क्रीप है।",
+    "mr": "कमाई वाढली तसे अपग्रेड वेगाने आले. हाच लाइफस्टाइल क्रीप."
+   },
+   "steps": [
+    {
+     "en": "Lifestyle creep: spending rises every time income does.",
+     "hi": "लाइफ़स्टाइल क्रीप: आय बढ़े तो खर्च भी बढ़ता है।",
+     "mr": "लाइफस्टाइल क्रीप: उत्पन्न वाढले की खर्चही वाढतो."
+    },
+    {
+     "en": "Treats feel small; together they eat the raise.",
+     "hi": "छोटे शौक़ मिलकर पूरी बढ़ोतरी खा जाते हैं।",
+     "mr": "लहान हौशी मिळून संपूर्ण पगारवाढ खातात."
+    },
+    {
+     "en": "Save half of every raise before you get used to it.",
+     "hi": "आदत पड़ने से पहले हर बढ़ोतरी का आधा बचाएँ।",
+     "mr": "सवय होण्यापूर्वी प्रत्येक वाढीतील अर्धी बचत करा."
+    }
+   ],
+   "example": {
+    "en": "A ₹4,000 raise: save ₹2,000, enjoy ₹2,000.",
+    "hi": "₹4,000 की बढ़ोतरी: ₹2,000 बचाएँ, ₹2,000 का आनंद लें।",
+    "mr": "₹4,000 वाढ: ₹2,000 बचवा, ₹2,000 चा आनंद घ्या."
+   }
+  },
+  "w1_6": {
+   "insight": {
+    "en": "A snowball grows by its own size. So does money left to compound.",
+    "hi": "गोला अपने ही आकार से बढ़ता है। चक्रवृद्धि वाला पैसा भी।",
+    "mr": "गोळा स्वतःच्या आकाराने वाढतो. चक्रवाढीचा पैसाही."
+   },
+   "steps": [
+    {
+     "en": "Compounding: returns start earning returns of their own.",
+     "hi": "चक्रवृद्धि: रिटर्न पर भी रिटर्न मिलने लगता है।",
+     "mr": "चक्रवाढ: परताव्यावरही परतावा मिळू लागतो."
+    },
+    {
+     "en": "Rule of 72: divide 72 by the yearly rate to get the years to double.",
+     "hi": "72 का नियम: 72 को सालाना दर से भाग दें, दोगुना होने के साल मिलेंगे।",
+     "mr": "72 चा नियम: 72 ला वार्षिक दराने भागा, दुप्पट होण्याची वर्षे मिळतील."
+    },
+    {
+     "en": "Fees chip the ball every year, so small fees matter.",
+     "hi": "शुल्क हर साल गोले को घिसते हैं, इसलिए छोटे शुल्क भी मायने रखते हैं।",
+     "mr": "शुल्क दरवर्षी गोळा झिजवतात, म्हणून लहान शुल्कही महत्त्वाचे."
+    }
+   ],
+   "example": {
+    "en": "At 10% a year, money doubles about every 72 ÷ 10 = 7.2 years.",
+    "hi": "10% सालाना पर पैसा लगभग हर 72 ÷ 10 = 7.2 साल में दोगुना।",
+    "mr": "10% वार्षिक दराने पैसा सुमारे दर 72 ÷ 10 = 7.2 वर्षांनी दुप्पट."
+   }
+  },
+  "w1_7": {
+   "insight": {
+    "en": "Every rupee needs a job and a bucket.",
+    "hi": "हर रुपये का एक काम और एक बकेट होना चाहिए।",
+    "mr": "प्रत्येक रुपयाला काम आणि बादली हवी."
+   },
+   "steps": [
+    {
+     "en": "Needs keep you running; wants are the fun on top.",
+     "hi": "ज़रूरतें आपको चलाती हैं; चाहतें ऊपर का मज़ा हैं।",
+     "mr": "गरजा तुम्हाला चालवतात; हौस वरचा आनंद."
+    },
+    {
+     "en": "Emergency money stays easy to reach; long-term money can be locked away.",
+     "hi": "आपात पैसा आसानी से मिलना चाहिए; लंबी अवधि का पैसा बंद रह सकता है।",
+     "mr": "आपत्कालीन पैसा सहज मिळावा; दीर्घकालीन पैसा बंद ठेवता येतो."
+    },
+    {
+     "en": "80CCD(1B) is an extra NPS deduction on top of the 80C limit (old regime).",
+     "hi": "80CCD(1B), 80C सीमा के ऊपर अतिरिक्त NPS कटौती है (पुरानी व्यवस्था)।",
+     "mr": "80CCD(1B) ही 80C मर्यादेवरची अतिरिक्त NPS वजावट आहे (जुनी प्रणाली)."
+    }
+   ],
+   "example": {
+    "en": "50-30-20: on ₹40,000, about ₹20,000 needs, ₹12,000 wants, ₹8,000 savings.",
+    "hi": "50-30-20: ₹40,000 पर लगभग ₹20,000 ज़रूरत, ₹12,000 चाहत, ₹8,000 बचत।",
+    "mr": "50-30-20: ₹40,000 वर सुमारे ₹20,000 गरजा, ₹12,000 हौस, ₹8,000 बचत."
+   },
+   "sourceUrl": "https://incometaxindia.gov.in/Pages/tools/deduction-under-section-80c-to-80u.aspx",
+   "lastReviewed": "2026-06 (model knowledge; needs human check against the current Finance Act)"
+  },
+  "w1_8": {
+   "insight": {
+    "en": "If it is urgent, secret or too good, stop and check.",
+    "hi": "अगर यह जल्दबाज़ी, गुप्त या बहुत अच्छा लगे, रुकें और जाँचें।",
+    "mr": "घाईचे, गुप्त किंवा फार चांगले वाटले, तर थांबा आणि तपासा."
+   },
+   "steps": [
+    {
+     "en": "Scammers rush you so you do not think.",
+     "hi": "ठग जल्दबाज़ी कराते हैं ताकि आप सोचें नहीं।",
+     "mr": "भामटे घाई करवतात म्हणजे तुम्ही विचार करू नये."
+    },
+    {
+     "en": "OTPs and UPI PINs are for you alone.",
+     "hi": "OTP और UPI PIN सिर्फ़ आपके लिए हैं।",
+     "mr": "OTP आणि UPI PIN फक्त तुमच्यासाठी."
+    },
+    {
+     "en": "No genuine investment guarantees high returns.",
+     "hi": "कोई असली निवेश ऊँचे रिटर्न की गारंटी नहीं देता।",
+     "mr": "कोणतीही खरी गुंतवणूक जास्त परताव्याची हमी देत नाही."
+    }
+   ],
+   "example": {
+    "en": "Report fraud on the national cybercrime helpline, 1930.",
+    "hi": "धोखाधड़ी की शिकायत राष्ट्रीय साइबर अपराध हेल्पलाइन 1930 पर करें।",
+    "mr": "फसवणुकीची तक्रार राष्ट्रीय सायबर गुन्हे हेल्पलाइन 1930 वर करा."
+   }
+  },
+  "w1_9": {
+   "insight": {
+    "en": "Plant early: the tree that grows longest gives the most shade.",
+    "hi": "जल्दी लगाएँ: सबसे लंबा बढ़ने वाला पेड़ सबसे ज़्यादा छाया देता है।",
+    "mr": "लवकर लावा: सर्वात जास्त वाढणारे झाड सर्वात जास्त सावली देते."
+   },
+   "steps": [
+    {
+     "en": "NPS invests your contributions until retirement, regulated by PFRDA.",
+     "hi": "NPS रिटायरमेंट तक आपका योगदान निवेश करता है, PFRDA द्वारा नियंत्रित।",
+     "mr": "NPS निवृत्तीपर्यंत तुमचे योगदान गुंतवते, PFRDA नियंत्रित."
+    },
+    {
+     "en": "Starting ten years earlier gives growth ten more years to compound.",
+     "hi": "दस साल पहले शुरू करने से बढ़त को चक्रवृद्धि के दस साल और मिलते हैं।",
+     "mr": "दहा वर्षे आधी सुरुवात म्हणजे चक्रवाढीला दहा वर्षे जास्त."
+    },
+    {
+     "en": "80CCD(1B) can reduce taxable income by up to ₹50,000 a year (old regime).",
+     "hi": "80CCD(1B) कर योग्य आय को सालाना ₹50,000 तक घटा सकता है (पुरानी व्यवस्था)।",
+     "mr": "80CCD(1B) करपात्र उत्पन्न वर्षाला ₹50,000 पर्यंत कमी करू शकते (जुनी प्रणाली)."
+    }
+   ],
+   "example": {
+    "en": "The bars came from the calculator: ₹2,000 a month at an assumed 9%, from 25 or 35 until 60.",
+    "hi": "बार कैलकुलेटर से थे: ₹2,000 महीना, अनुमानित 9%, 25 या 35 से 60 तक।",
+    "mr": "बार कॅल्क्युलेटरमधून: ₹2,000 दरमहा, गृहीत 9%, 25 किंवा 35 ते 60."
+   },
+   "sourceUrl": "https://www.pfrda.org.in",
+   "lastReviewed": "2026-06 (model knowledge; needs human check against the current Finance Act)"
+  },
+  "w1_10": {
+   "insight": {
+    "en": "Runway is how many months you can live with no income.",
+    "hi": "रनवे यानी बिना आय के आप कितने महीने चल सकते हैं।",
+    "mr": "रनवे म्हणजे उत्पन्नाशिवाय तुम्ही किती महिने चालू शकता."
+   },
+   "steps": [
+    {
+     "en": "An emergency fund covers job loss: aim for 3 to 6 months of expenses.",
+     "hi": "आपात कोष नौकरी जाने पर काम आता है: 3 से 6 महीने का खर्च रखें।",
+     "mr": "आपत्कालीन निधी नोकरी गेल्यावर कामी येतो: 3 ते 6 महिन्यांचा खर्च ठेवा."
+    },
+    {
+     "en": "Health insurance stops one hospital bill from eating that fund.",
+     "hi": "स्वास्थ्य बीमा एक अस्पताल बिल को वह कोष खाने से रोकता है।",
+     "mr": "आरोग्य विमा एका रुग्णालय बिलाला तो निधी खाऊ देत नाही."
+    },
+    {
+     "en": "Diversification means one market fall does not sink everything.",
+     "hi": "विविधीकरण का मतलब है एक बाज़ार गिरावट सब कुछ नहीं डुबाती।",
+     "mr": "विविधीकरण म्हणजे एका बाजार घसरणीने सर्व बुडत नाही."
+    }
+   ],
+   "example": {
+    "en": "₹1,20,000 saved ÷ ₹30,000 monthly expenses = 4 months of runway.",
+    "hi": "₹1,20,000 बचत ÷ ₹30,000 मासिक खर्च = 4 महीने का रनवे।",
+    "mr": "₹1,20,000 बचत ÷ ₹30,000 मासिक खर्च = 4 महिन्यांचा रनवे."
+   }
+  }
+ },
+ "i18nReview": "hi and mr strings are machine-drafted and need human review"
+}

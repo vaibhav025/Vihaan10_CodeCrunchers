@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-11-14T11:33:44.669Z",
+        "reason": "Claude triage: L282 .move-card::before is a 3px top-edge hover line (inset 0 0 auto 0, scaleX reveal), not a side border; pre-existing"
+      }
+    ]
+  }
+}

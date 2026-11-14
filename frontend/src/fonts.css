@@ -1,0 +1,11 @@
+/*
+ * Self-hosted fonts, loaded just after first paint (see lib/fonts.ts). Every face uses
+ * font-display: swap and a unicode-range, so a file only downloads when text on screen needs
+ * it: English pages load the Latin files, Hindi and Marathi pages add the Devanagari ones.
+ * The rupee sign comes from Newsreader's latin-ext file in serif text and from Noto Sans
+ * Devanagari in sans text, as it did with Google Fonts.
+ */
+@import '@fontsource-variable/dm-sans/wght.css';
+@import '@fontsource/noto-sans-devanagari/devanagari-400.css';
+@import '@fontsource/noto-sans-devanagari/devanagari-500.css';
+
