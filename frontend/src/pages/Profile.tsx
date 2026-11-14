@@ -1,41 +1,24 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen, Coins, Star, Users, X } from '../components/ui/icons'
+import { X } from '../components/ui/icons'
 import { AnimatePresence, m } from 'framer-motion'
 import { spring } from '../ui/motion'
 import WorldStill from '../components/world/WorldStill'
-import { Flame, Label, StateChip, XpBar } from '../components/ui/kit'
+import { Label, StateChip } from '../components/ui/kit'
 import { LANGS, useI18n, type Lang } from '../lib/i18n'
 import { useSession } from '../lib/session'
 import { useTheme } from '../lib/theme'
 import { api, type Contribution, type Rank } from '../lib/api'
-import { BADGES, LEVEL_TITLES, levelInfo, monthlyIncome, recommended, type BadgeGroup } from '../lib/game'
-import { project } from '../lib/nps'
+import { LEVEL_TITLES, levelInfo } from '../lib/game'
 import { pad2, rupees } from '../lib/format'
-import { loadFonts } from '../lib/fonts'
-import { FriendQuest, League, Shop } from '../components/meta/MetaPanels'
 import { setReduceMotion, useReduceMotion } from '../lib/motionPref'
 import CountUp from '../ui/CountUp'
 import { getMoney } from '../lib/tracker'
 import { readiness } from '../lib/readiness'
 import { useMeta } from '../lib/useMeta'
-import Tilt from '../ui/Tilt'
 import Segmented from '../ui/Segmented'
-import { useToast } from '../ui/Toast'
-import { useInView } from '../ui/Reveal'
 import { Skeleton } from '../ui/PressableCard'
-import { lazy, Suspense } from 'react'
-import { canRunLive } from '../components/world/World'
-const TrophyShelf = lazy(() => import('../components/profile/TrophyShelf'))
-import { palette, stateColor, stateVitality } from '../design-tokens'
-
-const GLYPH: Record<BadgeGroup, (p: { size: number }) => ReactNode> = {
-  learning: p => <BookOpen {...p} strokeWidth={1.2} aria-hidden />,
-  streak: p => <Flame {...p} />,
-  contribution: p => <Coins {...p} strokeWidth={1.2} aria-hidden />,
-  social: p => <Users {...p} strokeWidth={1.2} aria-hidden />,
-  special: p => <Star {...p} strokeWidth={1.2} aria-hidden />,
-}
+import { useToast } from '../ui/Toast'
 
 export default function Profile() {
   const { t, lang, setLang } = useI18n()
@@ -45,7 +28,6 @@ export default function Profile() {
   const reduce = useReduceMotion()
   const meta = useMeta()
   const nav = useNavigate()
-  const [earned, setEarned] = useState<string[]>([])
   const [history, setHistory] = useState<{ contributions: Contribution[]; total: number; count: number } | null>(null)
   const [board, setBoard] = useState('national')
   const [ranks, setRanks] = useState<{ leaderboard: Rank[]; user_rank: Rank | null } | null>(null)
@@ -54,24 +36,11 @@ export default function Profile() {
   const [busy, setBusy] = useState(false)
 
   const loadHistory = useCallback(() => api.history().then(setHistory).catch(() => {}), [])
-  useEffect(() => { loadHistory(); api.badges().then(b => setEarned(b.badges.map(x => x.name))).catch(() => {}) }, [loadHistory])
+  useEffect(() => { loadHistory() }, [loadHistory])
   useEffect(() => { setRanks(null); api.leaderboard(board).then(setRanks).catch(() => setRanks({ leaderboard: [], user_rank: null })) }, [board])
 
-  const toast = useToast()
-  const [fresh, setFresh] = useState<string[]>([])
-  useEffect(() => {
-    if (!earned.length) return
-    const seen: string[] = JSON.parse(localStorage.getItem('pq.seenBadges') ?? '[]')
-    const added = earned.filter(e => !seen.includes(e))
-    if (added.length) { setFresh(added); added.forEach(a => toast(`${t('pro.unlocked')}: ${a}`)); localStorage.setItem('pq.seenBadges', JSON.stringify(earned)) }
-  }, [earned]) // eslint-disable-line react-hooks/exhaustive-deps
   if (!user) return null
   const lv = levelInfo(user.total_xp)
-  const have: Record<string, number | undefined> = {
-    quests: progress.journal.filter(j => j.correct).length, streak: progress.streak,
-    contributions: history?.count, total: history?.total,
-  }
-
   async function log(e: FormEvent) {
     e.preventDefault()
     const n = Number(amount)
@@ -82,14 +51,9 @@ export default function Profile() {
       setAmount(''); setNote({ ok: true, text: t('pro.logged', { state: t(`state.${r.avatar_state}`) }) })
       await Promise.all([refresh(), loadHistory()])
       api.leaderboard(board).then(setRanks).catch(() => {})
-      api.badges().then(b => setEarned(b.badges.map(x => x.name))).catch(() => {})
     } catch (err) { setNote({ ok: false, text: err instanceof Error ? err.message : String(err) }) }
     finally { setBusy(false) }
   }
-
-  const monthly = history?.count ? history.total / history.count : recommended(user.income_range)
-  const returnPct = user.risk_profile === 'conservative' ? 8 : user.risk_profile === 'aggressive' ? 12 : 10
-  const pension = project({ age: user.age, retireAge: user.retirement_age, monthly, returnPct, annualIncome: monthlyIncome(user.income_range) * 12 }).monthly_pension
 
   return (
     <div className="mx-auto w-full max-w-[1100px] space-y-12 px-5 sm:px-8">
@@ -135,21 +99,6 @@ export default function Profile() {
           </div>
         </div>
       </header>
-
-      <div className="grid gap-10 lg:grid-cols-[340px_minmax(0,1fr)]">
-        <ShareCard name={user.name} state={user.avatar_state} level={lv.level} title={lv.title} pension={pension} road={progress.journal.length / 10} />
-        <section aria-labelledby="ins">
-          <div className="flex items-baseline justify-between gap-3 border-b border-line pb-3">
-            <h2 id="ins" className="text-[1.9rem] text-ink">{t('pro.badges')}</h2>
-            <Label>{t('pro.earned', { n: earned.length, total: BADGES.length })}</Label>
-          </div>
-          {/* the shelf shows what is earned; empty, it repeats the grid below as grey outlines */}
-          {canRunLive() && earned.length > 0 && <Suspense fallback={<div className="h-[190px]" />}><TrophyShelf earned={BADGES.map(b => earned.includes(b.name))} total={BADGES.length} /></Suspense>}
-          <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 xl:grid-cols-4">
-            {BADGES.map(b => <Medal key={b.name} b={b} got={earned.includes(b.name)} fresh={fresh.includes(b.name)} have={have[b.trigger]} />)}
-          </ul>
-        </section>
-      </div>
 
       <div className="grid gap-12 lg:grid-cols-2">
         <section aria-labelledby="con">
@@ -208,9 +157,6 @@ export default function Profile() {
         </section>
       </div>
 
-      <Shop />
-      <div className="grid gap-4 md:grid-cols-2"><League /><FriendQuest /></div>
-
       <section aria-labelledby="set" className="border-t border-line pt-6">
         <h2 id="set" className="text-[1.9rem] text-ink">{t('pro.settings')}</h2>
         <div className="mt-5 grid gap-6 sm:grid-cols-2">
@@ -235,132 +181,6 @@ export default function Profile() {
   )
 }
 
-/** Poster of the player's standing, drawn to a canvas so it can be saved as an image. */
-function ShareCard({ name, state, level, title, pension, road }: {
-  name: string; state: keyof typeof stateVitality; level: number; title: string; pension: number; road: number
-}) {
-  const { t } = useI18n()
-  const canvas = useRef<HTMLCanvasElement>(null)
-  const still = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let live = true
-    const draw = async () => {
-      const cv = canvas.current, svg = still.current?.querySelector('svg')
-      if (!cv || !svg) return
-      await loadFonts()
-      await document.fonts.ready
-      const W = 1080, H = 1350, ctx = cv.getContext('2d')!
-      ctx.fillStyle = palette.paper; ctx.fillRect(0, 0, W, H)
-      const glow = ctx.createRadialGradient(W * 0.9, 0, 0, W * 0.9, 0, 900)
-      glow.addColorStop(0, '#FFFAE8'); glow.addColorStop(1, 'rgba(255,250,232,0)')
-      ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H)
-      ctx.strokeStyle = palette.ink; ctx.lineWidth = 2; ctx.strokeRect(48, 48, W - 96, H - 96)
-
-      // the live 3D frame from the player's last visit to the path, or the still drawing
-      const frame = localStorage.getItem('pq.worldFrame')
-      const img = new Image()
-      const xml = new XMLSerializer().serializeToString(svg)
-      await new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); img.src = frame ?? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(xml)}` })
-      if (!live) return
-      if (frame) { const h = 860 * img.height / Math.max(img.width, 1); ctx.drawImage(img, 110, 420 + Math.max(0, (654 - h) / 2), 860, Math.min(h, 654)) }
-      else ctx.drawImage(img, 110, 420, 860, 654)
-
-      const mono = (s: string, x: number, y: number, align: CanvasTextAlign = 'left') => {
-        // tracked caps sized to stay readable when the card is shown small, shrunk to fit the frame
-        const c = ctx as CanvasRenderingContext2D & { letterSpacing?: string }
-        const text = s.toUpperCase(), max = W - 192
-        let size = 30
-        const set = () => { ctx.font = `500 ${size}px "IBM Plex Mono", monospace`; c.letterSpacing = `${Math.round(size * 0.12)}px` }
-        set()
-        while (ctx.measureText(text).width > max && size > 16) { size--; set() }
-        ctx.fillStyle = palette.soft; ctx.textAlign = align
-        ctx.fillText(text, x, y)
-        c.letterSpacing = '0px'
-      }
-      mono('SixtyFy', 96, 128); mono(`Level ${pad2(level)}`, W - 96, 128, 'right')
-      ctx.fillStyle = palette.ink; ctx.textAlign = 'left'
-      ctx.font = '400 104px "Newsreader Variable", "Noto Serif Devanagari", serif'
-      ctx.fillText(name.length > 14 ? `${name.slice(0, 13)}…` : name, 96, 280)
-      ctx.font = 'italic 400 64px "Newsreader Variable", serif'; ctx.fillStyle = palette.leaf
-      ctx.fillText('at sixty.', 96, 360)
-      ctx.fillStyle = stateColor[state]; ctx.fillRect(96, 400, 14, 14)
-      mono(`${t(`state.${state}`)} · ${title}`, 124, 414)
-
-      mono(t('land.pension'), 96, 1112)
-      ctx.font = '400 96px "Newsreader Variable", serif'; ctx.fillStyle = palette.ink; ctx.textAlign = 'left'
-      ctx.fillText(rupees(pension), 96, 1206)
-      mono(t('common.disclaimer'), 96, 1268)
-    }
-    draw()
-    return () => { live = false }
-  }, [name, state, level, title, pension, t])
-
-  const share = () => {
-    canvas.current?.toBlob(async blob => {
-      if (!blob) return
-      const file = new File([blob], 'pensionquest-future-self.png', { type: 'image/png' })
-      const nav = navigator as Navigator & { canShare?: (d: unknown) => boolean }
-      if (nav.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: 'SixtyFy' }).catch(() => {})
-      else save()
-    })
-  }
-  const save = () => {
-    const a = document.createElement('a')
-    a.download = 'pensionquest-future-self.png'
-    a.href = canvas.current!.toDataURL('image/png')
-    a.click()
-  }
-
-  return (
-    <section aria-labelledby="card" className="h-fit lg:sticky lg:top-24">
-      <h2 id="card" className="text-[1.9rem] text-ink">{t('pro.card')}</h2>
-      <p className="mt-1 text-soft">{t('pro.cardSub')}</p>
-      <Tilt max={8} glare className="mt-4 overflow-hidden rounded-lg">
-        <canvas ref={canvas} width={1080} height={1350} className="block w-full rounded-lg border border-line shadow-lift"
-          role="img" aria-label={`${name}. ${t(`state.${state}`)}. ${title}. ${t('land.pension')}: ${rupees(pension)}`} />
-      </Tilt>
-      <div className="sticky bottom-20 mt-4 flex gap-2 md:static">
-        <button className="btn flex-1" onClick={save}>{t('pro.download')}</button>
-        <button className="btn-quiet flex-1 !min-h-[48px]" onClick={share}>{t('pro.share')}</button>
-      </div>
-      <div ref={still} hidden><WorldStill vitality={stateVitality[state]} road={Math.max(road, level / 7)} level={level} /></div>
-    </section>
-  )
-}
-
-/** An insignia: metallic and glowing when earned, an outline with a progress ring when locked. */
-function Medal({ b, got, fresh, have }: { b: (typeof BADGES)[number]; got: boolean; fresh: boolean; have?: number }) {
-  const { t } = useI18n()
-  const [ref, seen] = useInView<HTMLLIElement>()
-  const Icon = GLYPH[b.group]
-  const pct = have === undefined ? null : Math.min(have / b.value, 1)
-  const C = 2 * Math.PI * 38
-  return (
-    <li ref={ref} className="medal group relative flex flex-col items-center text-center">
-      <button className={`relative grid h-[84px] w-[84px] place-items-center rounded-full transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-105 ${fresh && seen ? 'medal-new' : ''}`}
-        aria-describedby={`tip-${b.trigger}-${b.value}`}>
-        {got ? (
-          <span className={`absolute inset-[6px] overflow-hidden rounded-full border border-[#A97C2C] bg-[radial-gradient(circle_at_35%_30%,#F6DDA0,#F2B544_55%,#9C6F22)] text-[#1A1304] shadow-[0_0_24px_rgb(var(--amber-soft)/0.65)] ${seen ? 'shine' : ''}`}>
-            <span className="absolute inset-[5px] rounded-full border border-[#FFF3D0]/50" />
-          </span>
-        ) : <span className="absolute inset-[6px] rounded-full border border-dashed border-soft/60" />}
-        {!got && pct !== null && (
-          <svg className="absolute inset-0 -rotate-90" viewBox="0 0 84 84" aria-hidden>
-            <circle cx="42" cy="42" r="38" fill="none" className="stroke-line" strokeWidth="2.5" />
-            <circle cx="42" cy="42" r="38" fill="none" className="stroke-forest" strokeWidth="2.5" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} />
-          </svg>
-        )}
-        <span className={`relative ${got ? 'text-[#1A1304]' : 'text-soft'}`}><Icon size={26} /></span>
-      </button>
-      <span className="mt-2.5 font-serif text-[17px] leading-tight text-ink">{b.name}</span>
-      <span className="label mt-1">{got ? t('pro.unlocked') : pct !== null ? `${Math.floor(have!)} / ${b.value}` : t('pro.locked')}</span>
-      <span id={`tip-${b.trigger}-${b.value}`} role="tooltip" className="surface-float pointer-events-none absolute -top-2 left-1/2 z-20 w-44 -translate-x-1/2 -translate-y-full rounded-md px-3 py-2 text-[13px] text-ink opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">{b.description}</span>
-    </li>
-  )
-}
-
-/** Future You as a portrait, wearing whatever is equipped from the shop. */
 function Avatar({ wear }: { wear: string[] }) {
   return (
     <svg viewBox="0 0 120 120" className="absolute inset-[10px] rounded-full bg-[#18181B]" aria-hidden>

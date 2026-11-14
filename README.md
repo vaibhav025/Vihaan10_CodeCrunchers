@@ -58,7 +58,7 @@ Most working Indians under 40 do not plan for retirement. Pension products feel 
 - A scam-awareness section and an employer PF check.
 
 ### Everywhere
-- English, Hindi and Marathi.
+- English and Hindi. (Marathi text exists but is switched off for now.)
 - Dark and plum themes, with keyboard focus rings, reduced-motion support and a mobile layout down to 360px.
 - A guided sign-up that sets age, target retirement age, outlook on retirement and current investments.
 - Profile editing, data export and account deletion.
@@ -179,7 +179,7 @@ This is application-level encryption for a hackathon project, not a compliance c
 | `frontend/src/sim/` | The Market Lab engine: market, funds, career run, schemes and quiz. |
 | `frontend/src/components/world/` | The 3D scenes. |
 | `frontend/src/components/landing/` | The plan card, stats card and steps section. |
-| `frontend/src/lib/locales/` | English, Hindi and Marathi text. |
+| `frontend/src/lib/locales/` | English and Hindi text (Marathi kept but switched off). |
 | `frontend-mobile/` | Translations for a mobile client. |
 | `ml/` | The original NPS knowledge base and prompts. |
 | `docker-compose.yml` | The API with PostgreSQL and Redis. |
@@ -282,7 +282,7 @@ The backend tests cover sign-up and login, encryption of stored data, isolation 
 
 ## Known limits
 
-- **Translations.** Newer screens have Hindi and Marathi text that was machine-drafted and needs a human review. A few new landing labels are English only.
+- **Translations.** Newer screens have Hindi text that was machine-drafted and needs a human review. A few new landing labels are English only.
 - **Financial facts.** NPS, EPF, PPF and tax details in lessons should be checked against official sources before real-world use.
 - **3D art.** The city buildings and the Future You character are built in code from simple shapes, not sculpted models.
 - **Projections.** Pension and corpus figures use fixed assumptions and are illustrative.

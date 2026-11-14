@@ -10,7 +10,7 @@ import Lanterns from './Lanterns'
 import Character from './Character'
 import CameraRig from './CameraRig'
 import Atmosphere, { foliage } from './Atmosphere'
-import { makeCity, CITY_GHOSTS as GHOSTS } from './zones/City'
+import { makeCity, Traffic, CITY_GHOSTS as GHOSTS } from './zones/City'
 import Trinkets from './Trinkets'
 import { world as C } from '../../design-tokens'
 
@@ -44,7 +44,7 @@ export default function LifeScene(props: {
         orthographic shadows="soft" flat
         // renders on demand; the Driver asks for frames only while something moves
         frameloop="demand"
-        dpr={[1, 1.5]}
+        dpr={[1, matchMedia('(pointer: coarse)').matches ? 1.5 : 2]}
         camera={{ position: [14, 13, 14], near: 0.1, far: 200, zoom: 40 }}
         gl={{ preserveDrawingBuffer: props.mode === 'home', antialias: !matchMedia('(pointer: coarse)').matches, alpha: true, powerPreference: 'low-power' }}
         onCreated={({ gl }) => {
@@ -67,7 +67,7 @@ function World({ world, mode, scrollS = 0, dark, pulse, play, canPlay, recenter,
   const busy = useRef(true)
   const clocks = useMemo<ZoneClock[]>(() => ZONES.map(() => ({ start: -Infinity })), [])
   const live = useRef<Live>({
-    world, busy, charS: mode === 'landing' ? 0 : world.progress, charPos: new THREE.Vector3(), look: 0, lookTo: 0, zoomMul: 1, mode, dark, scrollS,
+    world, busy, charS: mode === 'landing' ? 0 : world.progress, charPos: new THREE.Vector3(), look: 0, lookTo: 0, zoomMul: 1, orbit: 0, orbitTo: 0, pitch: 0, pitchTo: 0, focus: null, mode, dark, scrollS,
     cine: { active: false, target: new THREE.Vector3(), lookAt: null, lookUntil: 0 }, celebrateAt: -9, nudgeAt: -9, dimAt: -9, lite: startLite(),
   })
   live.current.world = world; live.current.mode = mode; live.current.dark = dark; live.current.scrollS = scrollS
@@ -141,6 +141,7 @@ function World({ world, mode, scrollS = 0, dark, pulse, play, canPlay, recenter,
       <Road />
       <Lanterns />
       <Trinkets />
+      <Traffic />
       <Character cosmetics={cosmetics} />
       {cosmetics.includes('garden') && world.zones[1] === 'built' && (
         <group position={zoneCenter(1)}>{[[-1.4, 2.3], [-1.0, 2.35], [-0.6, 2.3]].map(([x, z], i) => (

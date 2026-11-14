@@ -14,6 +14,10 @@ export interface Live {
   look: number
   lookTo: number
   zoomMul: number
+  /** drag-to-orbit angles (radians), eased toward their targets */
+  orbit: number; orbitTo: number; pitch: number; pitchTo: number
+  /** a building the camera is holding on, or null */
+  focus: THREE.Vector3 | null
   mode: 'home' | 'quest' | 'landing'
   /** landing: camera position along the road from page scroll, in segments */
   scrollS: number

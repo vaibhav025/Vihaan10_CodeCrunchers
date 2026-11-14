@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import WorldStill from './WorldStill'
+import CityUI from './CityUI'
 import { canRunLive } from './World'
 import { worldFromProfile, ZONES, type Profile } from './worldFromProfile'
 import { clearDebug, setDebug, setDebugNight, useDebugNight, useDebugOverrides } from './debug'
@@ -67,6 +68,7 @@ export default function LifeWorld({ profile, userId, mode = 'home', scrollS = 0,
         )}
       </div>
       <p className="sr-only" aria-live="polite">{announce}</p>
+      <CityUI />
       {!backdrop && <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center gap-2">
         {cine && <button className="link pointer-events-auto rounded border border-line bg-card/95 px-3 !no-underline" onClick={() => setSkip(s => s + 1)}>{t('w.skip')}</button>}
         {away && !cine && <button className="link pointer-events-auto rounded border border-line bg-card/95 px-3 !no-underline" onClick={() => setRecenter(r => r + 1)}>{t('w.recenter')}</button>}

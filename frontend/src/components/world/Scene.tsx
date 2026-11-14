@@ -695,7 +695,7 @@ export default function Scene({ values, onSurvey, onReady, onFail }: {
       // the world animates continuously while visible; it stops rendering when the tab is
       // hidden or the canvas has scrolled out of view
       frameloop={visible ? 'always' : 'never'}
-      dpr={[1, 1.5]}
+      dpr={[1, matchMedia('(pointer: coarse)').matches ? 1.5 : 2]}
       camera={{ position: [12, 10.4, 12], near: 0.1, far: 80, zoom: 40 }}
       gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
       onCreated={({ gl }) => {
