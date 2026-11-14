@@ -12,11 +12,11 @@ import { useToast } from '../ui/Toast'
 import { Sidekick } from '../game/character/Character'
 import { tc } from '../components/tracker/strings'
 import { readiness, weakest } from '../lib/readiness'
-import { recordLesson } from '../lib/meta'
+import { recordLesson, setMeta } from '../lib/meta'
 import { REWARDS } from '../game/economy'
 import { Label } from '../components/ui/kit'
 import { useI18n, type Lang } from '../lib/i18n'
-import { useSession } from '../lib/session'
+import { today, useSession } from '../lib/session'
 import { api } from '../lib/api'
 import { monthlyIncome, recommended } from '../lib/game'
 import { rupees, rupeesShort } from '../lib/format'
@@ -118,6 +118,7 @@ export default function Coach() {
     setInput(''); setBusy(true); setLastQ(q)
     if (!localStorage.getItem('pq.coach.first')) { localStorage.setItem('pq.coach.first', '1'); recordLesson({ accuracy: 1, xp: REWARDS.xp[1] }); toast(`${tc('firstQ', lang)} · ${tc('xp', lang, { n: REWARDS.xp[1] })}`) }
     // retrieve: the most relevant notes, plus the player's own numbers only when they allow it
+    setMeta({ coachDay: today() })
     const docs = retrieve(q), facts = user && useCtx ? factSheet(user) : ''
     let sources = [...(facts ? [t('coach.yours')] : []), ...docs.map(d => d.title)]
     let reply: string

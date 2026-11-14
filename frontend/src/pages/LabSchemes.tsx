@@ -2,7 +2,8 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Check, Info, X } from '../components/ui/icons'
 import { Label, Range } from '../components/ui/kit'
-import { LabHead, LabNote, Stat, useLabSave } from '../components/lab/kit'
+import { Terms } from '../components/ui/Term'
+import { HowTo, LabHead, LabNote, Stat, useLabSave } from '../components/lab/kit'
 import Segmented from '../ui/Segmented'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
@@ -72,9 +73,11 @@ export default function LabSchemes() {
   const e = epf(basic, epfYears)
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
+    <div className="lab mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
       <LabHead title={t('lab.g2.title')} sub={t('lab.g2.sub')} />
       <LabNote />
+      <HowTo id="schemes" />
+      <Terms keys={['nps', 'apy', 'ppf', 'epf', 'ccd']} />
       <p className="flex items-start gap-2.5 rounded-md border border-rust/50 bg-paper px-3.5 py-2.5 text-[14px] leading-snug text-ink" role="note">
         <Info size={16} strokeWidth={1.5} aria-hidden className="mt-0.5 shrink-0 text-rust" />
         <span>{t('lab.g2.verifyNote')}</span>
@@ -239,10 +242,10 @@ function Quiz() {
               return (
                 <button key={o} role="radio" aria-checked={picked === i} disabled={picked !== undefined}
                   onClick={() => setPicks(ps => { const n = [...ps]; n[at] = i; return n })}
-                  className={`row py-3 ${isRight ? '!border-forest !bg-haze' : ''} ${isWrong ? '!border-rust nudge' : ''} ${picked !== undefined && !isRight && !isWrong ? 'opacity-60' : ''}`}>
+                  className={`row py-3 ${isRight ? '!border-up !bg-up/10' : ''} ${isWrong ? '!border-down nudge' : ''} ${picked !== undefined && !isRight && !isWrong ? 'opacity-60' : ''}`}>
                   <span className="flex-1 text-[16px] text-ink">{label(o)}</span>
-                  {isRight && <Check size={18} strokeWidth={2} className="text-forest" aria-label={t('lab.nr.right')} />}
-                  {isWrong && <X size={18} strokeWidth={2} className="text-rust" aria-label={t('lab.nr.wrong')} />}
+                  {isRight && <Check size={18} strokeWidth={2} className="text-up" aria-label={t('lab.nr.right')} />}
+                  {isWrong && <X size={18} strokeWidth={2} className="text-down" aria-label={t('lab.nr.wrong')} />}
                 </button>
               )
             })}

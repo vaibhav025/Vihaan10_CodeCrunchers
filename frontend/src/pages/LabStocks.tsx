@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FastForward, Newspaper, Pause, Play, RotateCcw } from '../components/ui/icons'
 import { Label } from '../components/ui/kit'
-import { LabHead, LabNote, LineChart, Move, Stat, useLabSave } from '../components/lab/kit'
+import { HowTo, LabHead, LabNote, LineChart, Move, Stat, useLabSave, Tick } from '../components/lab/kit'
 import { ConcentrationLesson, NewsRound, PanicTest, VolatilityLesson, WhyPanel, worth } from '../components/lab/stocks'
 import { useI18n } from '../lib/i18n'
 import { useToast } from '../ui/Toast'
@@ -95,9 +95,10 @@ export default function LabStocks() {
   const lastNews = [...hist].reverse().find(d => d.released.length)
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
+    <div className="lab mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
       <LabHead title={t('lab.s.title')} sub={t('lab.s.sub')} />
       <LabNote />
+      <HowTo id="stocks" />
 
       {/* the virtual account and the clock */}
       <section aria-label={t('lab.s.account')} className="hud p-5 sm:p-6">
@@ -112,11 +113,11 @@ export default function LabStocks() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="label mr-1">{t('lab.s.day', { n: m.day })} · {t('lab.s.market', { n: seed })}</span>
-            <button className="btn-quiet" onClick={() => advance()}><FastForward size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.next')}</button>
-            <button className="btn-quiet" aria-pressed={playing} onClick={() => setPlaying(p => !p)}>
+            <button className="btn-quiet" title={t('lab.s.tipNext')} onClick={() => advance()}><FastForward size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.next')}</button>
+            <button title={t('lab.s.tipPlay')} className="btn-quiet" aria-pressed={playing} onClick={() => setPlaying(p => !p)}>
               {playing ? <Pause size={16} strokeWidth={1.5} aria-hidden /> : <Play size={16} strokeWidth={1.5} aria-hidden />}{t(playing ? 'lab.s.pause' : 'lab.s.play')}
             </button>
-            <button className="btn-quiet" onClick={newMarket}><RotateCcw size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.newMarket')}</button>
+            <button className="btn-quiet" title={t('lab.s.tipNew')} onClick={newMarket}><RotateCcw size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.newMarket')}</button>
           </div>
         </div>
         <p className="mt-4 flex items-start gap-2 border-t border-line pt-3 text-[14px] text-soft" aria-live="polite">
@@ -143,7 +144,7 @@ export default function LabStocks() {
                     <span className="block text-[15px] font-medium leading-snug text-ink">{co.name}</span>
                     <span className="block truncate text-[12px] text-soft">{t(`lab.sec.${co.sector}`)}{shares[i] > 0 ? ` · ${t('lab.s.hold')} ${rupees(values[i])}` : ''}<span className="sm:hidden"> · {t(`lab.risk.${riskOf(co)}`)}</span></span>
                   </span>
-                  <span className="num text-right text-[16px] text-ink">{rupees(m.prices[i])}</span>
+                  <span className="num text-right text-[16px] text-ink"><Tick value={m.prices[i]}>{rupees(m.prices[i])}</Tick></span>
                   <span className="text-right text-[14px]"><Move pct={pct(m.parts[i].total)} /></span>
                   <span className="hidden text-right text-[13px] text-soft sm:block">{t(`lab.risk.${riskOf(co)}`)}</span>
                 </button>
@@ -157,7 +158,7 @@ export default function LabStocks() {
           <section aria-labelledby="co" className="hud p-5 sm:p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 id="co" className="text-[1.45rem] text-ink">{c.name}</h2>
-              <span className="num text-[1.45rem] text-ink">{rupees(m.prices[sel])}</span>
+              <span className="num text-[1.45rem] text-ink"><Tick value={m.prices[sel]}>{rupees(m.prices[sel])}</Tick></span>
             </div>
             <p className="text-[14px] text-soft">{t(`lab.sec.${c.sector}`)} · {t('lab.s.risk')}: {t(`lab.risk.${riskOf(c)}`)}</p>
             <div className="mt-3">
@@ -166,9 +167,10 @@ export default function LabStocks() {
             <p className="mt-3 text-[14px] text-soft">{t('lab.s.hold')}: <span className="text-ink">{rupees(values[sel])}</span></p>
             <div className="mt-2 flex flex-wrap gap-2">
               {BUY.map(a => <button key={a} className="btn-quiet" onClick={() => buy(a)}>{t('lab.s.buy', { amt: rupees(a) })}</button>)}
-              <button className="btn-quiet" disabled={!shares[sel]} onClick={() => sell(0.5)}>{t('lab.s.sellHalf')}</button>
-              <button className="btn-quiet" disabled={!shares[sel]} onClick={() => sell(1)}>{t('lab.s.sellAll')}</button>
+              <button className="btn-quiet" disabled={!shares[sel]} aria-describedby={shares[sel] ? undefined : 'sell-why'} onClick={() => sell(0.5)}>{t('lab.s.sellHalf')}</button>
+              <button className="btn-quiet" disabled={!shares[sel]} aria-describedby={shares[sel] ? undefined : 'sell-why'} onClick={() => sell(1)}>{t('lab.s.sellAll')}</button>
             </div>
+            {!shares[sel] && <p id="sell-why" className="mt-2 text-[13px] text-soft">{t('lab.s.sellWhy')}</p>}
           </section>
           <WhyPanel m={m} index={sel} />
         </div>

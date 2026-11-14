@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Check, Package } from '../ui/icons'
+import { Link } from 'react-router-dom'
+import { Check, ChevronRight, Package } from '../ui/icons'
 import { Flame, Label, XpBar } from '../ui/kit'
 import { useI18n } from '../../lib/i18n'
 import { today, useSession } from '../../lib/session'
@@ -8,33 +9,38 @@ import { DAY_CHEST, DEMOTE_XP, LEAGUES, PROMOTE_XP, SHOP, setMeta } from '../../
 import { api, type Rank } from '../../lib/api'
 import { play } from '../../lib/sound'
 
-/** Three daily quests; finishing all of them opens the day chest. */
+/** Three daily quests, each a link to where it is done; finishing all of them opens the day chest. */
 export function DailyQuests() {
   const { t } = useI18n()
   const { progress, saveProgress } = useSession()
   const meta = useMeta()
   const quests = [
-    { k: 'dq.lesson', done: meta.lessonsToday > 0 },
-    { k: 'dq.score', done: meta.bestAccToday >= 0.9 },
-    { k: 'dq.sim', done: progress.simDay === today() },
+    { k: 'dq.tracker', to: '/tracker', done: progress.simDay === today() },
+    { k: 'dq.lab', to: '/lab', done: meta.labDay === today() },
+    { k: 'dq.coach', to: '/coach', done: meta.coachDay === today() },
   ]
-  const all = quests.every(q => q.done)
+  const n = quests.filter(q => q.done).length, all = n === quests.length
   return (
-    <div className="hud p-5">
-      <Label>{t('dq.title')}</Label>
-      <ul className="mt-3 space-y-2">{quests.map(q => (
-        <li key={q.k} className="flex items-center gap-2.5 text-[15px]">
-          <span className={`grid h-5 w-5 place-items-center rounded-sm border ${q.done ? 'border-forest bg-forest text-on-forest' : 'border-soft/60'}`}>{q.done && <Check size={13} aria-hidden />}</span>
-          <span className={q.done ? 'text-soft line-through' : 'text-ink'}>{t(q.k)}</span>
+    <section aria-labelledby="dq-h" className="hud p-5">
+      <div className="flex items-baseline justify-between gap-3"><h2 id="dq-h" className="label">{t('dq.title')}</h2><span className="label" aria-live="polite">{t('dq.count', { n })}</span></div>
+      <XpBar pct={Math.round((n / quests.length) * 100)} className="mt-2.5" />
+      <ul className="mt-2">{quests.map(q => (
+        <li key={q.k}>
+          <Link to={q.to} className="-mx-2 flex min-h-[44px] items-center gap-2.5 rounded-lg px-2 text-[15px] transition-colors hover:bg-ink/[0.06]">
+            <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border ${q.done ? 'border-up bg-up text-black' : 'border-soft/60'}`}>{q.done && <Check size={13} strokeWidth={3} aria-hidden />}</span>
+            <span className={`flex-1 ${q.done ? 'text-soft line-through' : 'text-ink'}`}>{t(q.k)}</span>
+            <ChevronRight size={15} className="shrink-0 text-soft" aria-hidden />
+          </Link>
         </li>))}
       </ul>
-      {meta.dayChestClaimed ? <p className="label mt-3">{t('dq.chestDone', { c: DAY_CHEST.coins, t: DAY_CHEST.tokens })}</p> : (
-        <button disabled={!all} className="btn game-btn mt-4 w-full gap-2 !min-h-[46px] disabled:!bg-mist disabled:!text-soft" onClick={() => {
+      {meta.dayChestClaimed ? <p className="label mt-3">{t('dq.chestDone', { c: DAY_CHEST.coins, t: DAY_CHEST.tokens })}</p> : (<>
+        <button disabled={!all} aria-describedby={all ? undefined : 'dq-why'} className="btn-quiet mt-3 w-full gap-2" onClick={() => {
           play('level'); setMeta({ dayChestClaimed: true, restTokens: meta.restTokens + DAY_CHEST.tokens })
           saveProgress({ coins: progress.coins + DAY_CHEST.coins })
         }}><Package size={17} aria-hidden />{t('dq.chest')}</button>
-      )}
-    </div>
+        {!all && <p id="dq-why" className="mt-2 text-center text-[13px] text-soft">{t('dq.why')}</p>}
+      </>)}
+    </section>
   )
 }
 

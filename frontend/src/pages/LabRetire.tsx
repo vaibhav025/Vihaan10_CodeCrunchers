@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FastForward, RotateCcw } from '../components/ui/icons'
 import { Label, Range, StateChip } from '../components/ui/kit'
-import { LabHead, LabNote, LineChart, Move, Stat, useLabSave } from '../components/lab/kit'
+import { HowTo, LabHead, LabNote, LineChart, Move, Stat, useLabSave } from '../components/lab/kit'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
 import { useMoney } from '../lib/tracker'
@@ -78,9 +78,10 @@ export default function LabRetire() {
   const age = startAge + (sim?.year ?? 0)
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
+    <div className="lab mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
       <LabHead title={t('lab.r.title')} sub={t('lab.r.sub')} />
       <LabNote />
+      <HowTo id="retire" />
 
       {!sim && (
         <section className="hud p-5 sm:p-7">
@@ -138,11 +139,11 @@ export default function LabRetire() {
                 <Label>{t('lab.r.lastYear', { age: last.age })}</Label>
                 <p className="mt-1.5 text-[15px] text-ink">
                   {t('lab.r.market')} <Move pct={last.marketReturn * 100} />{' · '}
-                  {t('lab.r.marketPart')} <span className={last.marketGain < 0 ? 'text-rust' : 'text-forest'}>{last.marketGain < 0 ? '−' : '+'}{rupees(Math.abs(last.marketGain))}</span>{' · '}
-                  {t('lab.r.safePart')} <span className="text-forest">+{rupees(last.safeGain)}</span>
+                  {t('lab.r.marketPart')} <span className={last.marketGain < 0 ? 'text-down' : 'text-up'}>{last.marketGain < 0 ? '−' : '+'}{rupees(Math.abs(last.marketGain))}</span>{' · '}
+                  {t('lab.r.safePart')} <span className="text-up">+{rupees(last.safeGain)}</span>
                 </p>
                 {last.events.map(e => (
-                  <p key={e} className={`mt-2 rounded-md border p-3 text-[15px] leading-relaxed ${e === 'crash' || e === 'job_loss' || e === 'medical' ? 'border-rust/50 bg-paper text-ink' : 'border-line bg-paper text-ink'}`}>
+                  <p key={e} className={`mt-2 rounded-md border p-3 text-[15px] leading-relaxed ${e === 'crash' || e === 'job_loss' || e === 'medical' ? 'border-down/50 bg-down/[0.06] text-ink' : 'border-line bg-paper text-ink'}`}>
                     <span className="font-medium">{t(`lab.ev.${e}`)}</span> {t(`lab.ev.${e}.d`, { cost: rupees(last.cost) })}
                     {e === 'crash' && last.safeGain > 0 && <span className="block text-soft">{t('lab.r.safetyLayer', { v: rupees(last.safeGain) })}</span>}
                   </p>
@@ -152,7 +153,7 @@ export default function LabRetire() {
             )}
 
             {riskPrompt && (
-              <div role="alertdialog" aria-labelledby="rp" className="mt-5 rounded-md border border-rust/60 bg-paper p-4">
+              <div role="alertdialog" aria-labelledby="rp" className="mt-5 rounded-md border border-down/60 bg-down/[0.06] p-4">
                 <p id="rp" className="font-serif text-[1.25rem] text-ink">{t('lab.r.riskT', { age })}</p>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-soft">{t('lab.r.riskD', { pct: Math.round(equityShare(sim, plan) * 100) })}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -252,7 +253,7 @@ function ResultView({ sim, res, ghosts, learned, startAge, monthly, onApply, onA
                 <span className="text-[14px] text-soft"><span className="num text-[16px] text-ink">{rupeesShort(row.corpus)}</span> · {t(`state.${row.r.state}`)}</span>
               </div>
               <div className="mt-1 h-2.5 overflow-hidden rounded-sm bg-mist" aria-hidden>
-                <div className={`h-full origin-left ${row.id === 'you' ? 'bg-forest' : 'bg-sage'}`} style={{ transform: `scaleX(${row.corpus / max})` }} />
+                <div className={`h-full origin-left ${row.id === 'you' ? 'bg-up' : 'bg-sage'}`} style={{ transform: `scaleX(${row.corpus / max})` }} />
               </div>
               {row.id !== 'you' && <p className="mt-0.5 text-[12px] text-soft">{t(`lab.g.${row.id}.d`)}</p>}
             </li>

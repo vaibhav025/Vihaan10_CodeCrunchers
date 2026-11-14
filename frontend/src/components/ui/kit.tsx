@@ -109,7 +109,7 @@ export function Disclaimer({ className = '' }: { className?: string }) {
   return (
     <p className={`label ${className}`}>
       {t('common.disclaimer')}{' '}
-      <a className="underline underline-offset-2 hover:text-ink" href="https://www.npstrust.org.in" target="_blank" rel="noreferrer">{t('common.official')}</a>
+      <a className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-ink" href="https://www.npstrust.org.in" target="_blank" rel="noreferrer">{t('common.official')}</a>
     </p>
   )
 }

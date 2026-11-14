@@ -1,0 +1,30 @@
+/* Market Lab: a trading-desk look. Black panels, mono figures, and vivid green and red for anything that moves. */
+.lab { --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; position: relative; isolation: isolate; }
+/* a faint dot grid behind the desk, fading out toward the bottom */
+.lab::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(rgb(var(--ink) / .09) 1px, transparent 1.4px); background-size: 26px 26px;
+  -webkit-mask-image: linear-gradient(180deg, #000, transparent 85%); mask-image: linear-gradient(180deg, #000, transparent 85%); }
+.lab .label { font-family: var(--mono); letter-spacing: .1em; font-size: 11.5px; }
+.lab .num, .lab .tabular-nums { font-family: var(--mono); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.lab .hud { border-radius: 20px; background: linear-gradient(180deg, rgb(var(--ink) / .045), rgb(var(--ink) / .012)), rgb(var(--card)); }
+.lab .hud > h2, .lab .hud h2 { letter-spacing: -.02em; }
+/* list rows read as a price board: tight, square-ish, with a green edge on the chosen one */
+.lab .row { border-radius: 12px; background: transparent; border-color: rgb(var(--ink) / .1); }
+.lab .row:hover:not(:disabled) { transform: none; background: rgb(var(--ink) / .05); border-color: rgb(var(--ink) / .22); }
+.lab .row[aria-pressed='true'], .lab .row[aria-checked='true'] { border-color: rgb(var(--up) / .7); background: rgb(var(--up) / .08); box-shadow: inset 3px 0 0 rgb(var(--up)); }
+.lab .row[role='radio'] { border-style: dashed; } .lab .row[role='radio'][aria-checked='true'] { border-style: solid; }
+
+.lab-eyebrow { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: rgb(var(--up)); }
+.lab-eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: rgb(var(--up)); box-shadow: 0 0 12px rgb(var(--up)); animation: lab-pulse 1.8s ease-in-out infinite; }
+@keyframes lab-pulse { 50% { opacity: .35; } }
+.lab-chip { font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: rgb(var(--soft)); border: 1px solid rgb(var(--ink) / .2); border-radius: 999px; padding: 6px 12px; white-space: nowrap; }
+
+/* a price cell flashes green or red when its value changes */
+.tick { display: inline-block; border-radius: 6px; padding: 2px 6px; margin: -2px -6px; }
+.tick.up { animation: tick-up .9s ease-out; } .tick.down { animation: tick-down .9s ease-out; }
+@keyframes tick-up { from { background: rgb(var(--up) / .38); color: rgb(var(--up)); } to { background: transparent; } }
+@keyframes tick-down { from { background: rgb(var(--down) / .38); color: rgb(var(--down)); } to { background: transparent; } }
+
+.lab-chart { border-radius: 14px; border: 1px solid rgb(var(--ink) / .1); background: linear-gradient(180deg, rgb(var(--ink) / .03), transparent), #050506; }
+.lab-chart .glow { filter: drop-shadow(0 0 6px currentColor); }
+@media (prefers-reduced-motion: reduce) { .tick.up, .tick.down, .lab-eyebrow i { animation: none; } }

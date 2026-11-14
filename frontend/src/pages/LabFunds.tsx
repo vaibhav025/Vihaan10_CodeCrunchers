@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Check, X } from '../components/ui/icons'
 import { Label, Range } from '../components/ui/kit'
-import { LabHead, LabNote, LineChart, Stat, useLabSave } from '../components/lab/kit'
+import { Terms } from '../components/ui/Term'
+import { HowTo, LabHead, LabNote, LineChart, Stat, useLabSave } from '../components/lab/kit'
 import Segmented from '../ui/Segmented'
 import { useI18n } from '../lib/i18n'
 import { rupees, rupeesShort } from '../lib/format'
@@ -20,13 +21,15 @@ function Checkpoint({ id, options, answer, picked, onPick }: { id: string; optio
   return (
     <div className="mt-5 border-t border-line pt-4">
       <p id={`ck-${id}`} className="text-[15px] font-medium text-ink">{t(`lab.f.${id}.q`)}</p>
-      <div role="radiogroup" aria-labelledby={`ck-${id}`} className="mt-2 flex flex-wrap gap-2">
+      <p className="label mt-1">{t('lab.f.pick')}</p>
+      <div role="radiogroup" aria-labelledby={`ck-${id}`} className="mt-2.5 grid max-w-2xl gap-2">
         {options.map((o, i) => (
           <button key={o} role="radio" aria-checked={picked === i} disabled={done} onClick={() => onPick(i)}
-            className={`min-h-[44px] rounded-md border px-3.5 text-[15px] ${done && i === answer ? 'border-forest bg-haze font-medium text-ink' : picked === i ? 'border-rust text-ink' : 'border-line bg-card text-soft hover:border-forest'} disabled:cursor-default`}>
-            {done && i === answer && <Check size={14} strokeWidth={2} aria-hidden className="mr-1.5 inline text-forest" />}
-            {done && picked === i && i !== answer && <X size={14} strokeWidth={2} aria-hidden className="mr-1.5 inline text-rust" />}
-            {t(`lab.f.${id}.${o}`)}
+            className={`flex min-h-[52px] w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-[15px] transition-colors ${done && i === answer ? 'border-up bg-up/10 font-medium text-ink' : picked === i ? 'border-down bg-down/10 text-ink' : done ? 'border-line text-soft' : 'border-ink/20 bg-ink/[0.03] text-ink hover:border-ink/60 hover:bg-ink/[0.07]'} disabled:cursor-default`}>
+            <span className={`num grid h-7 w-7 shrink-0 place-items-center rounded-full border text-[13px] ${done && i === answer ? 'border-up bg-up text-black' : done && picked === i ? 'border-down bg-down text-black' : 'border-ink/30'}`} aria-hidden>
+              {done && i === answer ? <Check size={14} strokeWidth={3} /> : done && picked === i ? <X size={14} strokeWidth={3} /> : 'ABC'[i]}
+            </span>
+            <span className="flex-1">{t(`lab.f.${id}.${o}`)}</span>
           </button>
         ))}
       </div>
@@ -52,6 +55,9 @@ export default function LabFunds() {
   const save = useLabSave()
   const [seed] = useState(savedSeed)
   const [picked, setPicked] = useState<Record<string, number>>({})
+  const [at, setAt] = useState(0)
+  const top = useRef<HTMLDivElement>(null)
+  const go = (n: number) => { setAt(n); requestAnimationFrame(() => top.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })) }
   const pick = (id: string, i: number) => setPicked(p => ({ ...p, [id]: i }))
   const ANSWERS: Record<string, number> = { fee: 1, sip: 0, nav: 1, basket: 0 }
   const ids = Object.keys(ANSWERS)
@@ -84,11 +90,28 @@ export default function LabFunds() {
   const [bets, setBets] = useState<ReturnType<typeof basketVsBets> | null>(null)
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
+    <div className="lab mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
       <LabHead title={t('lab.f.title')} sub={t('lab.f.sub')} />
       <LabNote />
+      <HowTo id="funds" />
+      <Terms keys={['sip', 'nav', 'etf']} />
 
-      <Section id="fee" n={1}>
+      {/* one experiment at a time: where you are, and which ones are answered */}
+      <nav ref={top} aria-label={t('lab.f.stepOf', { n: at + 1 })} className="scroll-mt-28">
+        <ol className="grid grid-cols-4 gap-2">
+          {ids.map((id, n) => (
+            <li key={id}>
+              <button type="button" onClick={() => go(n)} aria-current={at === n ? 'step' : undefined} aria-label={t('lab.f.goTo', { n: n + 1 })}
+                className={`flex min-h-[44px] w-full items-center gap-2 rounded-xl border px-3 text-left text-[13px] transition-colors ${at === n ? 'border-ink/70 bg-ink/[0.08] text-ink' : 'border-line text-soft hover:border-ink/40'}`}>
+                <span className={`num grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] ${picked[id] !== undefined ? 'bg-up text-black' : 'border border-current'}`}>{picked[id] !== undefined ? <Check size={13} strokeWidth={3} aria-hidden /> : n + 1}</span>
+                <span className="hidden truncate sm:block">{t(`lab.f.${id}.t`)}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      {at === 0 && <Section id="fee" n={1}>
         <div className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
           <Range label={t('lab.f.monthly')} value={monthly} min={1000} max={20000} step={1000} onChange={setMonthly} format={rupees} />
           <Range label={t('lab.f.activeFee')} value={fee} min={0.5} max={2.5} step={0.1} onChange={setFee} format={v => `${v.toFixed(1)}%`} />
@@ -104,13 +127,13 @@ export default function LabFunds() {
         <dl className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <Stat label={t('lab.f.paid')} value={rupeesShort(drag.paid)} sub={t('lab.f.over', { years: YEARS })} />
           <Stat label={t('lab.f.activeEnd')} value={rupeesShort(end(drag.active))} />
-          <Stat label={t('lab.f.feeCost')} value={<span className="text-rust">{rupeesShort(drag.feeCost)}</span>} sub={t('lab.f.feeCostD', { pct: Math.round((drag.feeCost / end(drag.noFee)) * 100) })} />
+          <Stat label={t('lab.f.feeCost')} value={<span className="text-down">{rupeesShort(drag.feeCost)}</span>} sub={t('lab.f.feeCostD', { pct: Math.round((drag.feeCost / end(drag.noFee)) * 100) })} />
           <Stat label={t('lab.f.etfEnd')} value={rupeesShort(end(drag.etf))} sub={t('lab.f.etfEndD')} />
         </dl>
         <Checkpoint id="fee" options={['a', 'b', 'c']} answer={ANSWERS.fee} picked={picked.fee} onPick={i => pick('fee', i)} />
-      </Section>
+      </Section>}
 
-      <Section id="sip" n={2}>
+      {at === 1 && <Section id="sip" n={2}>
         <div className="mt-4">
           <LineChart label={t('lab.f.sip.chart')} format={rupeesShort} height={170}
             series={[{ name: t('lab.f.sipLine'), values: sl.sip }, { name: t('lab.f.lumpLine'), values: sl.lump, tone: 'amber', dashed: true }]}
@@ -124,9 +147,9 @@ export default function LabFunds() {
         </dl>
         <p className="mt-3 text-[14px] text-soft">{t('lab.f.sip.note')}</p>
         <Checkpoint id="sip" options={['a', 'b', 'c']} answer={ANSWERS.sip} picked={picked.sip} onPick={i => pick('sip', i)} />
-      </Section>
+      </Section>}
 
-      <Section id="nav" n={3}>
+      {at === 2 && <Section id="nav" n={3}>
         <div className="mt-3 max-w-md">
           <Segmented label={t('lab.f.day')} value={day} onChange={setDay} options={[1, 2, 3, 4, 5].map(n => ({ id: String(n), name: t('lab.f.dayN', { n }) }))} />
         </div>
@@ -143,9 +166,9 @@ export default function LabFunds() {
           <Stat label={t('lab.f.navToday')} value={`₹ ${closes[d].toFixed(2)}`} sub={t('lab.f.navTodayD')} />
         </dl>
         <Checkpoint id="nav" options={['a', 'b', 'c']} answer={ANSWERS.nav} picked={picked.nav} onPick={i => pick('nav', i)} />
-      </Section>
+      </Section>}
 
-      <Section id="basket" n={4}>
+      {at === 3 && <Section id="basket" n={4}>
         {!bets ? <button className="btn-quiet mt-4" onClick={() => setBets(basketVsBets(40, 10, seed))}>{t('lab.f.basket.run')}</button> : (
           <div role="status" className="mt-4 space-y-4">
             {([['single', bets.singleLoss, bets.singleRange], ['basket', bets.basketLoss, bets.basketRange]] as const).map(([k, loss, range]) => {
@@ -158,7 +181,7 @@ export default function LabFunds() {
                   </div>
                   {/* the span from a poor outcome (10th percentile) to a good one (90th), on a shared scale */}
                   <div className="relative mt-1.5 h-3 rounded-sm bg-mist" aria-hidden>
-                    <span className={`absolute inset-y-0 rounded-sm ${k === 'basket' ? 'bg-forest' : 'bg-amber'}`} style={{ left: `${(range[0] / max) * 100}%`, width: `${((range[1] - range[0]) / max) * 100}%` }} />
+                    <span className={`absolute inset-y-0 rounded-sm ${k === 'basket' ? 'bg-up' : 'bg-amber'}`} style={{ left: `${(range[0] / max) * 100}%`, width: `${((range[1] - range[0]) / max) * 100}%` }} />
                     <span className="absolute inset-y-[-3px] w-px bg-ink" style={{ left: `${(1 / max) * 100}%` }} />
                   </div>
                 </div>
@@ -168,7 +191,15 @@ export default function LabFunds() {
           </div>
         )}
         <Checkpoint id="basket" options={['a', 'b', 'c']} answer={ANSWERS.basket} picked={picked.basket} onPick={i => pick('basket', i)} />
-      </Section>
+      </Section>}
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <button type="button" className="btn-quiet" disabled={at === 0} onClick={() => go(at - 1)}>← {t('lab.f.prevExp')}</button>
+        <span className="label">{t('lab.f.stepOf', { n: at + 1 })}</span>
+        {at < ids.length - 1
+          ? <button type="button" className={picked[ids[at]] !== undefined ? 'btn' : 'btn-quiet'} onClick={() => go(at + 1)}>{t('lab.f.nextExp')} →</button>
+          : answered < ids.length ? <span className="text-[14px] text-soft">{t('lab.f.answerAll')}</span> : <span />}
+      </div>
 
       {answered === ids.length && (
         <section className="band p-6 sm:p-8" role="status">

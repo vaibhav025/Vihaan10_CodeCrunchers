@@ -1,26 +1,38 @@
 import { useState } from 'react'
-import { DailyQuests, GoalRing, League, StreakNotes } from '../components/meta/MetaPanels'
+import { m } from 'framer-motion'
+import { DailyQuests, League, StreakNotes } from '../components/meta/MetaPanels'
 import ToolsStrip from '../components/meta/ToolsStrip'
+import { MonthCard, NextStep, TipCard, rise, useLabRows } from '../components/dash/panels'
+import MarketPulse from '../components/dash/MarketPulse'
+import { LabBoard, ProgressBoard, VaultBoard } from '../components/dash/boards'
 import { checkIn } from '../lib/meta'
-import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
 
-/** Dashboard: today's goal and quests, streak, league, Readiness Score and the safety tools. */
+/** Dashboard: the next step, the score and what it lacks, money at 60, Lab progress, today's quests and the month so far. */
 export default function Path() {
-  const { t } = useI18n()
   const { user } = useSession()
   const [gap] = useState(checkIn)
+  const { rows, failed } = useLabRows()
   if (!user) return null
 
   return (
-    <div className="mx-auto w-full max-w-[1320px] px-5 sm:px-8">
-      <h1 className="sr-only">{t('nav.path')}</h1>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0">
-          <StreakNotes gap={gap} />
-          <ToolsStrip />
+    <div className="mx-auto w-full max-w-[1320px] space-y-5 px-5 sm:px-8">
+      <StreakNotes gap={gap} />
+      <NextStep rows={rows} />
+      <ProgressBoard rows={rows} i={1} />
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0 space-y-5">
+          <MarketPulse i={2} />
+          <VaultBoard i={3} />
+          <LabBoard rows={rows} failed={failed} i={4} />
+          <m.div {...rise(5)}><ToolsStrip tools /></m.div>
         </div>
-        <aside className="space-y-4"><GoalRing /><DailyQuests /><League compact /></aside>
+        <aside className="space-y-5">
+          <m.div {...rise(2)}><DailyQuests /></m.div>
+          <MonthCard i={3} />
+          <TipCard i={4} />
+          {(user.total_xp ?? 0) > 0 && <m.div {...rise(5)}><League compact /></m.div>}
+        </aside>
       </div>
     </div>
   )

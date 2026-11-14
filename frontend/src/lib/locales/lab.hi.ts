@@ -1,6 +1,7 @@
 // Market Lab strings in Hindi. Spread into hi.ts.
 const labHi: Record<string, string> = {
   'nav.lab': 'लैब',
+  'lab.pretend': 'आभासी पैसा',
   'lab.note': 'काल्पनिक कंपनियों और आभासी पैसे वाला सीखने का सिमुलेशन। यह निवेश सलाह नहीं है।',
   'lab.back': 'लैब पर वापस',
   'lab.up': 'ऊपर', 'lab.down': 'नीचे', 'lab.flat': 'कोई बदलाव नहीं',

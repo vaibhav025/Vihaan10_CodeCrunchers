@@ -12,6 +12,7 @@ import { page as pageMotion } from './ui/motion'
 import { useReduceMotion } from './lib/motionPref'
 import { Disclaimer, Label } from './components/ui/kit'
 import { Boot, Celebration, HudBar } from './components/ui/game'
+import Tour from './components/ui/Tour'
 import { GameEventsProvider } from './lib/events'
 import Landing from './pages/Landing'
 import Cursor from './ui/Cursor'
@@ -28,7 +29,7 @@ const TABS = [
 
 function Wordmark() {
   return (
-    <Link to="/" className="flex items-center gap-2.5" aria-label="SixtyFy">
+    <Link to="/" className="flex min-h-[44px] items-center gap-2.5" aria-label="SixtyFy">
       <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden>
         <rect width="32" height="32" rx="9" className="fill-forest" />
         <path d="M8 22 16 9l8 13" fill="none" className="stroke-on-forest" strokeWidth="2.200" strokeLinejoin="round" />
@@ -194,6 +195,7 @@ function Shell({ children }: { children: ReactNode }) {
 
       <main id="main" className="relative flex-1 pt-[88px] sm:pt-[104px]">
         {inGame && <div className="mb-5"><HudBar /></div>}
+        {inGame && <Tour />}
         <div>{children}</div>
       </main>
 

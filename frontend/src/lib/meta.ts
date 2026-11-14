@@ -10,10 +10,12 @@ export interface Meta {
   restTokens: number; owned: string[]; equipped: string[]; boostUntil: number
   goal: 1 | 2 | 3; lastVisit: string; shield: { streak: number; day: string } | null
   shieldWeek: string; shieldScore: number
+  /** Days (YYYY-MM-DD) a Lab run was last saved and the coach was last asked, for daily quests. */
+  labDay: string; coachDay: string
 }
 const KEY = 'pq.meta'
 const isoWeek = (d = new Date()) => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return `${t.getUTCFullYear()}-W${Math.ceil(((+t - +y) / 864e5 + 1) / 7)}` }
-const BASE: Meta = { day: '', lessonsToday: 0, bestAccToday: 0, dayChestClaimed: false, week: '', weekXp: 0, weekLessons: 0, league: 0, restTokens: 0, owned: [], equipped: [], boostUntil: 0, goal: 1, lastVisit: '', shield: null, shieldWeek: '', shieldScore: 0 }
+const BASE: Meta = { day: '', lessonsToday: 0, bestAccToday: 0, dayChestClaimed: false, week: '', weekXp: 0, weekLessons: 0, league: 0, restTokens: 0, owned: [], equipped: [], boostUntil: 0, goal: 1, lastVisit: '', shield: null, shieldWeek: '', shieldScore: 0, labDay: '', coachDay: '' }
 
 export const LEAGUES = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond']
 /** League rules on this device: 300+ XP in a week promotes, under 50 demotes. */

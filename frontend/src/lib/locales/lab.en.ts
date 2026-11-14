@@ -1,6 +1,7 @@
 // Market Lab strings. Spread into en.ts (and mr.ts until Marathi is translated).
 const labEn: Record<string, string> = {
   'nav.lab': 'Lab',
+  'lab.pretend': 'Virtual money',
   'lab.note': 'Learning simulation with fictional companies and virtual money. Not investment advice.',
   'lab.back': 'Back to the Lab',
   'lab.up': 'Up', 'lab.down': 'Down', 'lab.flat': 'No change',

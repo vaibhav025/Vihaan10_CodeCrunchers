@@ -1,3 +1,4 @@
+import uxEn from './ux.en'
 import labEn from './lab.en'
 import lab2En from './lab2.en'
 
@@ -9,7 +10,7 @@ const en: Record<string, string> = {
   'vt.steady': 'Steady Saver',
   'vt.fortified': 'Fortified',
   'vt.legendary': 'Legendary Vault',
-  'tr.waiting': 'Your vault is waiting.',
+  'tr.waiting': 'Your money details are waiting.',
   'tr.band': '{n} of 100. Six pillars hold it up.',
   'tr.nbm': 'Next best move',
   'tr.do': 'Do it',
@@ -61,7 +62,7 @@ const en: Record<string, string> = {
   'hb.add': 'Add habit',
   'nav.tracker': 'Tracker',
   'tr.score': 'Readiness Score',
-  'tr.empty': 'Fill your vault to see your score.',
+  'tr.empty': 'Add your money details to see your score.',
   'tr.emptySub': 'Add what you own and your monthly flow. Every slot you fill earns coins.',
   'tr.g.thriving': 'You are on track to retire at {age}.',
   'tr.g.stable': 'Nearly there for retiring at {age}.',
@@ -465,6 +466,7 @@ const en: Record<string, string> = {
   'hiw.s5.body': 'The coach answers with calculator figures and can use your tracker summary if you allow it. Daily quests and streaks build the habit.',
   'hiw.close': 'Five minutes a day is enough to start.',
   'hiw.closeSub': 'Free, in English and Hindi.',
+  ...uxEn,
 }
 
 export default en

@@ -8,7 +8,7 @@ import { useMoney } from '../../lib/tracker'
 import { readiness, weakest } from '../../lib/readiness'
 
 /** Quick tools from the path: Scam Shield (with this week's status), Employer check, Habits. */
-export default function ToolsStrip() {
+export default function ToolsStrip({ tools: only = false }: { tools?: boolean }) {
   const { t } = useI18n()
   const meta = useMeta()
   const { user } = useSession()
@@ -23,13 +23,14 @@ export default function ToolsStrip() {
   return (
     <>
     {/* the one number, and today's best move */}
-    <Link to="/tracker" className="hud pressable mt-4 flex items-center gap-4 p-4">
+    {!only && <Link to="/tracker" className="hud pressable mt-4 flex items-center gap-4 p-4">
       <ScoreRing score={started ? r.score : 0} size={84} label={t('tr.score')} />
       <span className="min-w-0 flex-1"><span className="label block">{t('tr.score')}</span>
         <span className="mt-1 block font-serif text-[1.25rem] leading-snug text-ink">{started ? t(`tr.fix.${weakest(r).key}`, { n: Math.round(weakest(r).max - weakest(r).got) }) : t('tr.empty')}</span></span>
       <ChevronRight size={18} className="shrink-0 text-soft" aria-hidden />
-    </Link>
-    <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+    </Link>}
+    {only && <h2 className="label px-1">{t('dash.tools')}</h2>}
+    <ul className={`${only ? 'mt-2' : 'mt-3'} grid gap-2 sm:grid-cols-3`}>
       {tools.map(x => (
         <li key={x.to}>
           <Link to={x.to} className="hud pressable flex min-h-[64px] items-center gap-3 px-4 py-3">

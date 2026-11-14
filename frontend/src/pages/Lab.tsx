@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Landmark, Lock, PieChart, Route, TrendingUp } from '../components/ui/icons'
 import { Label } from '../components/ui/kit'
-import { LabHead, LabNote } from '../components/lab/kit'
+import { HowTo, LabHead, LabNote } from '../components/lab/kit'
 import { useI18n } from '../lib/i18n'
 import { api, type LabRow } from '../lib/api'
 
@@ -21,9 +21,10 @@ export default function Lab() {
   const of = (id: string) => rows?.find(r => r.module === id)
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
+    <div className="lab mx-auto w-full max-w-[1100px] space-y-6 px-5 sm:px-8">
       <LabHead title={t('lab.title')} sub={t('lab.sub')} back={false} />
       <LabNote />
+      <HowTo id="hub" />
       <ul className="grid gap-4 md:grid-cols-2">
         {MODULES.map(mod => {
           const p = of(mod.id)

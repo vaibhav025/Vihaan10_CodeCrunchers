@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Check, Shield } from '../components/ui/icons'
 import { Label, StateChip } from '../components/ui/kit'
+import { Terms } from '../components/ui/Term'
 import Segmented from '../ui/Segmented'
 import CountUp from '../ui/CountUp'
 import { useI18n } from '../lib/i18n'
@@ -47,6 +48,7 @@ export default function EmployerCheck() {
           <Label>80CCD(2)</Label>
           <h1 className="mt-2 text-[clamp(2rem,4.5vw,3rem)] leading-[1.05]">{t('em.title')}</h1>
           <p className="mt-2 text-[16px] leading-relaxed text-[#FFFFFF]/80">{t('em.sub')}</p>
+          <Terms keys={['nps', 'ccd']} className="mt-3" />
         </div>
       </section>
 

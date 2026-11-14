@@ -52,9 +52,9 @@ export function WhyPanel({ m, index }: { m: Market; index: number }) {
               <span className="block text-[12px] leading-snug text-soft">{t(`lab.s.${k}D`)}</span>
             </dt>
             {/* a bar that grows right for a rise and left for a fall, from the centre line */}
-            <dd aria-hidden className="relative h-5 rounded-sm bg-mist">
+            <dd aria-hidden className="relative h-5 rounded-sm bg-ink/[0.06]">
               <span className="absolute inset-y-0 left-1/2 w-px bg-soft/50" />
-              <span className={`absolute inset-y-0.5 rounded-sm ${v >= 0 ? 'left-1/2 bg-forest' : 'right-1/2 bg-rust'}`} style={{ width: `${(Math.abs(v) / scale) * 50}%` }} />
+              <span className={`absolute inset-y-0.5 rounded-sm ${v >= 0 ? 'left-1/2 bg-up shadow-[0_0_12px_rgb(var(--up)/0.5)]' : 'right-1/2 bg-down shadow-[0_0_12px_rgb(var(--down)/0.5)]'}`} style={{ width: `${(Math.abs(v) / scale) * 50}%` }} />
             </dd>
             <dd className="text-right text-[14px]"><Move pct={pct(v)} digits={2} /></dd>
           </div>
@@ -176,7 +176,7 @@ export function NewsRound({ m, seed, onRelease, onScore }: {
                     <span className="text-[15px] font-medium text-ink">{t(`lab.sec.${s}`)}</span>
                     <span className="text-[14px] text-soft">
                       {t('lab.nr.yours')}: {t(`lab.${calls[s]}`)} · {t('lab.nr.actual')}: <span className="text-ink">{t(`lab.${actual}`)}</span> ·{' '}
-                      <span className={ok ? 'font-medium text-forest' : 'font-medium text-rust'}>{ok ? `✓ ${t('lab.nr.right')}` : `✕ ${t('lab.nr.wrong')}`}</span>
+                      <span className={ok ? 'font-medium text-up' : 'font-medium text-down'}>{ok ? `✓ ${t('lab.nr.right')}` : `✕ ${t('lab.nr.wrong')}`}</span>
                     </span>
                   </div>
                   <p className="mt-1 text-[14px] leading-relaxed text-soft">

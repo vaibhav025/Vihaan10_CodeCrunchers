@@ -1,9 +1,11 @@
-import { useCallback, useId, type ReactNode } from 'react'
+import { useCallback, useId, useRef, useState, type ReactNode } from 'react'
+import './lab.css'
 import { Link } from 'react-router-dom'
-import { ArrowDown, ArrowUp, FlaskConical, Minus } from '../ui/icons'
+import { ArrowDown, ArrowUp, FlaskConical, Info, Minus, X } from '../ui/icons'
 import { Label } from '../ui/kit'
 import { useI18n } from '../../lib/i18n'
-import { useSession } from '../../lib/session'
+import { today, useSession } from '../../lib/session'
+import { setMeta } from '../../lib/meta'
 import { useToast } from '../../ui/Toast'
 import { api } from '../../lib/api'
 
@@ -18,19 +20,51 @@ export function LabNote({ className = '' }: { className?: string }) {
   )
 }
 
+/** "How to play" in three steps. Open on the first visit to each Lab page, then a small link to bring it back. */
+export function HowTo({ id }: { id: string }) {
+  const { t } = useI18n()
+  const key = `pq.howto.${id}`
+  const [open, setOpen] = useState(() => { try { return localStorage.getItem(key) !== '1' } catch { return false } })
+  const close = () => { setOpen(false); try { localStorage.setItem(key, '1') } catch { /* private mode */ } }
+  if (!open) return <button type="button" className="link !min-h-[44px] gap-1.5 text-soft" onClick={() => setOpen(true)}><Info size={14} strokeWidth={1.6} aria-hidden />{t('howto.show')}</button>
+  return (
+    <section aria-labelledby={`howto-${id}`} className="hud relative border-up/40 p-5 sm:p-6">
+      <button type="button" onClick={close} aria-label={t('howto.close')} className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full text-soft hover:text-ink"><X size={17} strokeWidth={1.6} aria-hidden /></button>
+      <h2 id={`howto-${id}`} className="lab-eyebrow !flex pr-10"><i aria-hidden />{t('howto.title')}</h2>
+      <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+        {[1, 2, 3].map(n => (
+          <li key={n} className="flex gap-3 text-[15px] leading-snug text-ink">
+            <span className="num grid h-7 w-7 shrink-0 place-items-center rounded-full border border-ink/25 text-[13px]">{n}</span>
+            <span>{t(`howto.${id}.${n}`)}</span>
+          </li>
+        ))}
+      </ol>
+      <button type="button" className="btn-quiet mt-5" onClick={close}>{t('howto.got')}</button>
+    </section>
+  )
+}
+
 /** Page heading with a way back to the Lab. */
 export function LabHead({ title, sub, back = true, children }: { title: string; sub: string; back?: boolean; children?: ReactNode }) {
   const { t } = useI18n()
   return (
-    <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-      <div className="max-w-2xl">
+    <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 pb-2">
+      <div className="max-w-3xl">
         {back && <Link to="/lab" className="link !min-h-[44px]">← {t('lab.back')}</Link>}
-        <h1 className="text-[clamp(2rem,4.5vw,3rem)] leading-[1.05] text-ink">{title}</h1>
-        <p className="mt-2 text-[16px] leading-relaxed text-soft">{sub}</p>
+        <p className="lab-eyebrow !flex mt-2"><i aria-hidden />{back ? t('lab.title') : t('lab.pretend')}</p>
+        <h1 className="mt-4 text-[clamp(2.2rem,5.6vw,4.25rem)] font-semibold leading-[1] tracking-[-0.04em] text-ink">{title}</h1>
+        <p className="mt-4 max-w-2xl text-[17px] leading-relaxed text-soft">{sub}</p>
       </div>
-      {children}
+      <div className="flex flex-wrap items-center gap-3">{children}{back && <span className="lab-chip">{t('lab.pretend')}</span>}</div>
     </header>
   )
+}
+
+/** A figure that flashes green when it rises and red when it falls. */
+export function Tick({ value, children, className = '' }: { value: number; children: ReactNode; className?: string }) {
+  const prev = useRef(value), dir = useRef<'' | 'up' | 'down'>(''), n = useRef(0)
+  if (value !== prev.current) { dir.current = value > prev.current ? 'up' : 'down'; prev.current = value; n.current++ }
+  return <span key={n.current} className={`tick ${dir.current} ${className}`}>{children}</span>
 }
 
 /** A percentage change. The arrow and the sign carry the direction, not colour alone. */
@@ -40,7 +74,7 @@ export function Move({ pct, className = '', digits = 1 }: { pct: number; classNa
   const up = pct > 0
   const Icon = flat ? Minus : up ? ArrowUp : ArrowDown
   return (
-    <span className={`inline-flex items-center gap-1 tabular-nums ${flat ? 'text-soft' : up ? 'text-forest' : 'text-rust'} ${className}`}>
+    <span className={`inline-flex items-center gap-1 tabular-nums ${flat ? 'text-soft' : up ? 'text-up' : 'text-down'} ${className}`}>
       <Icon size={14} strokeWidth={2} aria-hidden />
       <span className="sr-only">{t(flat ? 'lab.flat' : up ? 'lab.up' : 'lab.down')}</span>
       {flat ? '0.0' : `${up ? '+' : '−'}${Math.abs(pct).toFixed(digits)}`}%
@@ -49,7 +83,8 @@ export function Move({ pct, className = '', digits = 1 }: { pct: number; classNa
 }
 
 export interface Series { name: string; values: number[]; tone?: 'forest' | 'amber' | 'soft' | 'rust'; dashed?: boolean }
-const STROKE = { forest: 'rgb(var(--forest))', amber: 'rgb(var(--amber))', soft: 'rgb(var(--soft))', rust: 'rgb(var(--rust))' }
+// the main line is green, a warning line red; a single line turns red when it ends below where it began
+const STROKE = { forest: 'rgb(var(--up))', amber: 'rgb(var(--amber))', soft: 'rgb(var(--soft))', rust: 'rgb(var(--down))' }
 
 /**
  * A small line chart. Lines differ by dash pattern as well as colour, the legend names each
@@ -71,6 +106,9 @@ export function LineChart({ series, label, height = 180, format = (n: number) =>
   const W = 600, H = 200
   const x = (i: number) => (i / (n - 1)) * W
   const y = (v: number) => H - ((v - lo) / (hi - lo)) * H
+  const lead = series[0], fell = series.length === 1 && lead.values.length > 1 && lead.values[lead.values.length - 1] < lead.values[0]
+  const colour = (s: Series) => (s === lead && !s.tone && fell ? STROKE.rust : STROKE[s.tone ?? 'forest'])
+  const leadPts = lead.values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')
   return (
     <figure>
       <div className="flex items-stretch gap-2">
@@ -78,12 +116,15 @@ export function LineChart({ series, label, height = 180, format = (n: number) =>
           <span className="label !tracking-normal">{format(hi - pad)}</span>
           <span className="label !tracking-normal">{format(lo + pad)}</span>
         </div>
-        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-labelledby={id} className="w-full rounded border border-line bg-paper" style={{ height }}>
+        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-labelledby={id} className="lab-chart w-full" style={{ height }}>
           <title id={id}>{label}</title>
-          {[0.25, 0.5, 0.75].map(f => <line key={f} x1="0" x2={W} y1={H * f} y2={H * f} stroke="rgb(var(--line))" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
-          {marks?.map(mk => <line key={mk.at} x1={x(mk.at)} x2={x(mk.at)} y1="0" y2={H} stroke="rgb(var(--rust))" strokeWidth="1" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />)}
+          <defs><linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={colour(lead)} stopOpacity="0.32" /><stop offset="1" stopColor={colour(lead)} stopOpacity="0" /></linearGradient></defs>
+          {lead.values.length > 1 && <polygon points={`0,${H} ${leadPts} ${x(lead.values.length - 1).toFixed(1)},${H}`} fill={`url(#${id}-fill)`} />}
+          {[0.25, 0.5, 0.75].map(f => <line key={f} x1="0" x2={W} y1={H * f} y2={H * f} stroke="rgb(var(--ink) / 0.07)" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
+          {marks?.map(mk => <line key={mk.at} x1={x(mk.at)} x2={x(mk.at)} y1="0" y2={H} stroke="rgb(var(--down))" strokeWidth="1" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />)}
           {series.map(s => (
-            <polyline key={s.name} fill="none" stroke={STROKE[s.tone ?? 'forest']} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"
+            <polyline key={s.name} fill="none" stroke={colour(s)} strokeWidth={s === lead ? 2.5 : 2} strokeLinejoin="round" strokeLinecap="round"
+              className={s === lead ? 'glow' : undefined} style={{ color: colour(s) }}
               strokeDasharray={s.dashed ? '7 5' : undefined} vectorEffect="non-scaling-stroke"
               points={s.values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')} />
           ))}
@@ -93,13 +134,13 @@ export function LineChart({ series, label, height = 180, format = (n: number) =>
         <figcaption className="mt-2 flex flex-wrap gap-x-5 gap-y-1 pl-[5rem]">
           {series.length > 1 && series.map(s => (
             <span key={s.name} className="inline-flex items-center gap-2 text-[13px] text-soft">
-              <svg width="26" height="6" aria-hidden><line x1="0" x2="26" y1="3" y2="3" stroke={STROKE[s.tone ?? 'forest']} strokeWidth="2" strokeDasharray={s.dashed ? '7 5' : undefined} /></svg>
+              <svg width="26" height="6" aria-hidden><line x1="0" x2="26" y1="3" y2="3" stroke={colour(s)} strokeWidth="2" strokeDasharray={s.dashed ? '7 5' : undefined} /></svg>
               {s.name}
             </span>
           ))}
           {marks?.map(mk => (
             <span key={mk.at} className="inline-flex items-center gap-2 text-[13px] text-soft">
-              <svg width="6" height="14" aria-hidden><line x1="3" x2="3" y1="0" y2="14" stroke="rgb(var(--rust))" strokeWidth="1.5" strokeDasharray="3 3" /></svg>
+              <svg width="6" height="14" aria-hidden><line x1="3" x2="3" y1="0" y2="14" stroke="rgb(var(--down))" strokeWidth="1.5" strokeDasharray="3 3" /></svg>
               {mk.text}
             </span>
           ))}
@@ -142,6 +183,7 @@ export function useLabSave() {
   return useCallback(async (module: 'stocks' | 'retire' | 'funds' | 'schemes', score: number, outcome: string, lessons: string[]) => {
     try {
       const r = await api.saveLab({ module, score: Math.round(Math.min(Math.max(score, 0), 100)), outcome, lessons })
+      setMeta({ labDay: today() })
       if (r.xp_earned > 0) { toast(t('lab.xp', { n: r.xp_earned })); void refresh() }
       else if (r.xp_capped) toast(t('lab.xpCap'))
       return r

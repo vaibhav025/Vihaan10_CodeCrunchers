@@ -10,7 +10,7 @@ export default {
         forest: v('forest'), 'forest-hover': v('forest-hover'), 'on-forest': v('on-forest'),
         leaf: v('leaf'), sage: v('sage'), mist: v('mist'), haze: v('haze'), line: v('line'),
         amber: v('amber'), 'amber-soft': v('amber-soft'), rust: v('rust'),
-        dim: v('dim'), thriving: v('thriving'), stable: v('stable'), struggling: v('struggling'),
+        dim: v('dim'), up: v('up'), down: v('down'), thriving: v('thriving'), stable: v('stable'), struggling: v('struggling'),
         critical: v('critical'), zero: v('zero'),
       },
       fontFamily: {

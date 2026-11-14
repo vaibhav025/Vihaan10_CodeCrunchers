@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { CoinIcon, Volume2, VolumeX } from './icons'
 import { Flame, Label, StateChip, useCountUp } from './kit'
+import Term from './Term'
 import { useI18n } from '../../lib/i18n'
 import { useSession } from '../../lib/session'
 import { useGameEvents } from '../../lib/events'
@@ -76,9 +77,9 @@ export function HudBar() {
   return (
     <div className="mx-auto w-full max-w-[1320px] px-3 sm:px-8">
       <div className="hud flex items-center gap-3 !rounded-full px-4 py-2 sm:gap-5 sm:px-6">
-        <StateChip state={user.avatar_state} className="hidden sm:inline-flex" />
-        <span className="relative grid h-10 w-10 shrink-0 place-items-center" aria-hidden>
-          <svg width="40" height="40" viewBox="0 0 40 40" className="-rotate-90">
+        <span tabIndex={0} data-tip={t('hud.tipState')} className="hidden rounded sm:inline-flex"><StateChip state={user.avatar_state} /></span>
+        <span tabIndex={0} data-tip={t('hud.tipLevel')} aria-label={t('pro.level', { n: lv.level })} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full">
+          <svg width="40" height="40" viewBox="0 0 40 40" className="-rotate-90" aria-hidden>
             <circle cx="20" cy="20" r="17" fill="none" className="stroke-line" strokeWidth="2" />
             <circle cx="20" cy="20" r="17" fill="none" className="stroke-forest" strokeWidth="2.5"
               strokeDasharray={106.8} strokeDashoffset={106.8 * (1 - ring / 100)} strokeLinecap="round" />
@@ -89,7 +90,7 @@ export function HudBar() {
           <p className="label truncate"><span className="sr-only">{t('pro.level', { n: lv.level })}. </span><span aria-hidden>LV {pad2(lv.level)} · </span>{lv.title}</p>
           <p className="relative mt-0.5 flex items-baseline gap-1.5">
             <span className="num text-[20px] leading-none text-ink">{Math.round(shown)}</span>
-            <span className="label">XP{lv.next ? ` / ${lv.next}` : ''}</span>
+            <span className="label"><Term k="xp" />{lv.next ? ` / ${lv.next}` : ''}</span>
             <AnimatePresence>
               {gain && (
                 <m.span key={gain.id} role="status"
@@ -101,14 +102,15 @@ export function HudBar() {
             </AnimatePresence>
           </p>
         </div>
-        <p className="flex items-center gap-1.5 text-ink" title={t('home.streak')}>
+        <p tabIndex={0} data-tip={t('hud.tipStreak')} data-tip-side="end" className="flex items-center gap-1.5 rounded text-ink">
           <span className={`${progress.streak ? 'text-amber' : 'text-soft'} ${rose ? 'flicker' : ''}`}><Flame size={18} /></span>
           <span className="num text-[20px] leading-none">{progress.streak}</span>
           <span className="label hidden sm:inline">{t('home.streak')}</span>
         </p>
-        <p className="flex items-center gap-1.5 text-ink" title={t('path.coins')}>
+        <p tabIndex={0} data-tip={t('hud.tipCoins')} data-tip-side="end" className="flex items-center gap-1.5 rounded text-ink">
           <span className="text-amber"><CoinIcon size={17} strokeWidth={1.5} aria-hidden /></span>
           <span className="num text-[20px] leading-none">{progress.coins}</span>
+          <span className="label hidden sm:inline">{t('path.coins')}</span>
         </p>
         <button
           onClick={() => { setSound(!sound); setS(!sound) }} aria-pressed={sound} aria-label="Sound"
