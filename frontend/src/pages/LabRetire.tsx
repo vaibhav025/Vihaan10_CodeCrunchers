@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FastForward, RotateCcw } from '../components/ui/icons'
 import { Label, Range, StateChip } from '../components/ui/kit'
+import { Terms } from '../components/ui/Term'
 import { HowTo, LabHead, LabNote, LineChart, Move, Stat, useLabSave } from '../components/lab/kit'
 import { useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
@@ -82,25 +83,26 @@ export default function LabRetire() {
       <LabHead title={t('lab.r.title')} sub={t('lab.r.sub')} />
       <LabNote />
       <HowTo id="retire" />
+      <Terms keys={['nps', 'apy', 'ppf', 'epf', 'mf', 'etf', 'equity', 'bonds']} />
 
       {!sim && (
-        <section className="hud p-5 sm:p-7">
+        <section data-guide="rr-setup" className="hud p-5 sm:p-7">
           <Label>{t('lab.r.setup')}</Label>
           <h2 className="mt-1.5 text-[1.7rem] leading-tight text-ink">{t('lab.r.setupT', { age: startAge, years: career.years })}</h2>
           <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-soft">{t('lab.r.setupD')}</p>
-          <dl className="mt-5 flex flex-wrap gap-x-10 gap-y-4">
+          <dl data-guide="rr-facts" className="mt-5 flex flex-wrap gap-x-10 gap-y-4">
             <Stat label={t('lab.r.startAge')} value={startAge} sub={t('lab.r.fromProfile')} />
             <Stat label={t('lab.r.salary')} value={rupees(firstSalary)} sub={t('lab.r.salaryD', { pct: Math.round(A.salaryGrowth * 100) })} />
             <Stat label={t('lab.r.saving')} value={`${Math.round(plan.saveRate * 100)}%`} sub={rupees(firstSalary * plan.saveRate) + t('common.perMonth')} />
           </dl>
-          <label className={`mt-5 flex min-h-[44px] items-start gap-3 ${canUseMine ? 'cursor-pointer' : 'opacity-60'}`}>
+          <label data-guide="rr-mine" className={`mt-5 flex min-h-[44px] items-start gap-3 ${canUseMine ? 'cursor-pointer' : 'opacity-60'}`}>
             <input type="checkbox" className="mt-1 h-5 w-5 accent-[rgb(var(--forest))]" checked={mine && canUseMine} disabled={!canUseMine} onChange={e => setMine(e.target.checked)} />
             <span>
               <span className="block text-[15px] text-ink">{t('lab.r.mine')}</span>
               <span className="block text-[13px] text-soft">{canUseMine ? t('lab.r.mineD') : t('lab.r.mineNone')}</span>
             </span>
           </label>
-          <div className="mt-5">
+          <div className="mt-5" data-guide="rr-rate">
             <span className="label">{t('lab.r.rate')}</span>
             <div role="radiogroup" aria-label={t('lab.r.rate')} className="mt-2 flex flex-wrap gap-2">
               {SAVE_RATES.map(r => (
@@ -109,13 +111,13 @@ export default function LabRetire() {
               ))}
             </div>
           </div>
-          <button className="btn mt-6" onClick={begin}>{t('lab.r.begin')}</button>
+          <button data-guide="rr-begin" className="btn mt-6" onClick={begin}>{t('lab.r.begin')}</button>
         </section>
       )}
 
       {sim && !done && (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-          <section aria-labelledby="year" className="hud p-5 sm:p-6">
+          <section aria-labelledby="year" data-guide="rr-year" className="hud p-5 sm:p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 id="year" className="text-[1.6rem] text-ink">{t('lab.r.age', { age })}</h2>
               <span className="label">{t('lab.r.yearOf', { n: sim.year + 1, total: career.years })}</span>
@@ -123,19 +125,19 @@ export default function LabRetire() {
             <div className="mt-2 h-1.5 overflow-hidden rounded-sm bg-mist" role="progressbar" aria-valuenow={sim.year} aria-valuemin={0} aria-valuemax={career.years} aria-label={t('lab.r.progress')}>
               <div className="h-full origin-left bg-forest transition-transform duration-500" style={{ transform: `scaleX(${sim.year / career.years})` }} />
             </div>
-            <dl className="mt-5 grid grid-cols-2 gap-4">
+            <dl data-guide="rr-savings" className="mt-5 grid grid-cols-2 gap-4">
               <Stat label={t('lab.r.corpus')} value={rupeesShort(corpusOf(sim))} sub={t('lab.r.todayMoney', { v: rupeesShort(corpusOf(sim) / sim.priceLevel) })} />
               <Stat label={t('lab.r.salaryNow')} value={rupees(sim.salary)} sub={t('lab.r.savesYear', { v: rupees(sim.salary * 12 * plan.saveRate) })} />
             </dl>
             {sim.history.length > 1 && (
-              <div className="mt-4">
+              <div className="mt-4" data-guide="rr-chart">
                 <LineChart label={t('lab.r.chart')} series={[{ name: t('lab.r.corpus'), values: [0, ...sim.history] }]} format={rupeesShort} height={140}
                   marks={log.map((r, i) => (r.events.includes('crash') ? { at: i + 1, text: t('lab.r.crashMark') } : null)).filter((x): x is { at: number; text: string } => !!x).slice(-1)} />
               </div>
             )}
 
             {last && (
-              <div className="mt-5 border-t border-line pt-4" role="status" aria-live="polite">
+              <div data-guide="rr-last" className="mt-5 border-t border-line pt-4" role="status" aria-live="polite">
                 <Label>{t('lab.r.lastYear', { age: last.age })}</Label>
                 <p className="mt-1.5 text-[15px] text-ink">
                   {t('lab.r.market')} <Move pct={last.marketReturn * 100} />{' · '}
@@ -153,7 +155,7 @@ export default function LabRetire() {
             )}
 
             {riskPrompt && (
-              <div role="alertdialog" aria-labelledby="rp" className="mt-5 rounded-md border border-down/60 bg-down/[0.06] p-4">
+              <div data-guide="rr-risk" role="alertdialog" aria-labelledby="rp" className="mt-5 rounded-md border border-down/60 bg-down/[0.06] p-4">
                 <p id="rp" className="font-serif text-[1.25rem] text-ink">{t('lab.r.riskT', { age })}</p>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-soft">{t('lab.r.riskD', { pct: Math.round(equityShare(sim, plan) * 100) })}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -164,13 +166,14 @@ export default function LabRetire() {
             )}
 
             <div className="mt-6 flex flex-wrap gap-2">
-              <button className="btn" onClick={() => nextYear(1)} disabled={riskPrompt}>{t('lab.r.next')}</button>
-              <button className="btn-quiet" onClick={() => nextYear(5)} disabled={riskPrompt}><FastForward size={16} strokeWidth={1.5} aria-hidden />{t('lab.r.five')}</button>
-              <button className="btn-quiet" onClick={() => nextYear(career.years)} disabled={riskPrompt}>{t('lab.r.toEnd')}</button>
+              <button data-guide="rr-next" className="btn" onClick={() => nextYear(1)} disabled={riskPrompt}>{t('lab.r.next')}</button>
+              <button data-guide="rr-five" className="btn-quiet" onClick={() => nextYear(5)} disabled={riskPrompt}><FastForward size={16} strokeWidth={1.5} aria-hidden />{t('lab.r.five')}</button>
+              <button data-guide="rr-end" className="btn-quiet" onClick={() => nextYear(career.years)} disabled={riskPrompt}>{t('lab.r.toEnd')}</button>
+              {riskPrompt && <p className="basis-full text-[13px] text-soft">{t('lab.r.answerFirst')}</p>}
             </div>
           </section>
 
-          <section aria-labelledby="split" className="hud p-5 sm:p-6">
+          <section aria-labelledby="split" data-guide="rr-split" className="hud p-5 sm:p-6">
             <h2 id="split" className="text-[1.45rem] text-ink">{t('lab.r.split')}</h2>
             <p className="mt-1 text-[14px] text-soft">{t('lab.r.splitD', { v: rupees(sim.salary * 12 * plan.saveRate) })}</p>
             <ul className="mt-3 space-y-1">
@@ -178,7 +181,7 @@ export default function LabRetire() {
                 const w = plan.weights[b] ?? 0
                 const share = weightSum ? w / weightSum : 0
                 return (
-                  <li key={b}>
+                  <li key={b} data-guide={`rr-b-${b}`}>
                     <Range label={`${t(`lab.b.${b}`)} · ${Math.round(share * 100)}%`} value={w} min={0} max={5} onChange={v => setWeight(b, v)}
                       format={() => rupeesShort(sim.balances[b])} />
                     <p className="-mt-1 mb-1 text-[12px] text-soft">{t(`lab.b.${b}.d`)}</p>
@@ -186,7 +189,7 @@ export default function LabRetire() {
                 )
               })}
             </ul>
-            <div className="mt-2 border-t border-line pt-3">
+            <div data-guide="rr-npseq" className="mt-2 border-t border-line pt-3">
               <Range label={t('lab.r.npsEq')} value={Math.round(plan.npsEquity * 100)} min={0} max={Math.round(A.npsEquityCap * 100)} step={5}
                 onChange={v => setPlan(p => ({ ...p, npsEquity: v / 100 }))} format={v => `${v}%`} />
               <p className="text-[12px] text-soft">{t('lab.r.npsEqD', { cap: Math.round(A.npsEquityCap * 100) })}</p>
@@ -216,7 +219,7 @@ function ResultView({ sim, res, ghosts, learned, startAge, monthly, onApply, onA
   const max = rows[0].corpus || 1
   return (
     <div className="space-y-6">
-      <section className="band p-6 sm:p-9" role="status">
+      <section data-guide="rr-result" className="band p-6 sm:p-9" role="status">
         <div className="relative z-10">
           <Label>{t('lab.r.atSixty')}</Label>
           <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -242,7 +245,7 @@ function ResultView({ sim, res, ghosts, learned, startAge, monthly, onApply, onA
         </div>
       </section>
 
-      <section aria-labelledby="ghosts" className="hud p-5 sm:p-6">
+      <section aria-labelledby="ghosts" data-guide="rr-ghosts" className="hud p-5 sm:p-6">
         <h2 id="ghosts" className="text-[1.6rem] text-ink">{t('lab.r.ghosts')}</h2>
         <p className="mt-1 text-[15px] text-soft">{t('lab.r.ghostsD')}</p>
         <ol className="mt-4 space-y-3">
@@ -261,7 +264,7 @@ function ResultView({ sim, res, ghosts, learned, startAge, monthly, onApply, onA
         </ol>
       </section>
 
-      <section aria-labelledby="learned">
+      <section aria-labelledby="learned" data-guide="rr-learned">
         <h2 id="learned" className="text-[1.6rem] text-ink">{t('lab.r.learned')}</h2>
         <ol className="mt-3 grid gap-4 lg:grid-cols-3">
           {learned.map((l, i) => (
@@ -274,7 +277,7 @@ function ResultView({ sim, res, ghosts, learned, startAge, monthly, onApply, onA
         </ol>
       </section>
 
-      <section aria-labelledby="apply" className="hud p-5 sm:p-7">
+      <section aria-labelledby="apply" data-guide="rr-apply" className="hud p-5 sm:p-7">
         <h2 id="apply" className="text-[1.6rem] text-ink">{t('lab.r.applyT')}</h2>
         <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-soft">{t('lab.r.applyD', { amt: rupees(monthly) })}</p>
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">

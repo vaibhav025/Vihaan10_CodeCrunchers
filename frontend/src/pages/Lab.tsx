@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Landmark, Lock, PieChart, Route, TrendingUp } from '../components/ui/icons'
+import { ChevronRight, Landmark, Lock, PieChart, Route, TrendingUp, Clock } from '../components/ui/icons'
 import { Label } from '../components/ui/kit'
-import { HowTo, LabHead, LabNote } from '../components/lab/kit'
+import { HowTo, LabHead, LabNote, Move } from '../components/lab/kit'
 import { useI18n } from '../lib/i18n'
 import { api, type LabRow } from '../lib/api'
+import { dateLabel, indexMove, quotes, useMarketDay } from '../lib/marketDay'
 
 const MODULES = [
   { id: 'retire', to: '/lab/retire', icon: Route, ready: true },
   { id: 'stocks', to: '/lab/stocks', icon: TrendingUp, ready: true },
+  { id: 'replay', to: '/lab/replay', icon: Clock, ready: true },
   { id: 'funds', to: '/lab/funds', icon: PieChart, ready: true },
   { id: 'schemes', to: '/lab/schemes', icon: Landmark, ready: true },
 ] as const
@@ -25,6 +27,7 @@ export default function Lab() {
       <LabHead title={t('lab.title')} sub={t('lab.sub')} back={false} />
       <LabNote />
       <HowTo id="hub" />
+      <RealDay />
       <ul className="grid gap-4 md:grid-cols-2">
         {MODULES.map(mod => {
           const p = of(mod.id)
@@ -36,7 +39,7 @@ export default function Lab() {
               </div>
               <h2 className="mt-4 text-[1.5rem] leading-tight text-ink">{t(`lab.m.${mod.id}`)}</h2>
               <p className="mt-1.5 text-[15px] leading-relaxed text-soft">{t(`lab.m.${mod.id}.d`)}</p>
-              {mod.ready && (
+              {mod.ready && mod.id !== 'replay' && (
                 <p className="mt-4 border-t border-line pt-3 text-[14px] text-soft" aria-live="polite">
                   {rows === null && !failed ? t('common.loading')
                     : p ? <>{t('lab.best')}: <span className="font-medium text-ink">{p.best_score} / 100</span> · {t('lab.runs', { n: p.runs_completed })}{p.last_outcome && mod.id === 'retire' ? <> · {t('lab.last')}: {t(`state.${p.last_outcome}`)}</> : null}</>
@@ -46,7 +49,7 @@ export default function Lab() {
             </>
           )
           return (
-            <li key={mod.id} className={mod.id === 'retire' ? 'md:col-span-2' : ''}>
+            <li key={mod.id} data-guide={`lab-${mod.id}`} className={mod.id === 'retire' ? 'md:col-span-2' : ''}>
               {mod.to
                 ? <Link to={mod.to} className="hud block h-full p-5 transition-transform hover:-translate-y-0.5 sm:p-6">{mod.id === 'retire' && <Label className="mb-3 block !text-rust">{t('lab.start')}</Label>}{body}</Link>
                 : <div className="hud h-full p-5 opacity-75 sm:p-6" aria-disabled="true">{body}</div>}
@@ -60,5 +63,22 @@ export default function Lab() {
         <p className="mt-2">{t('lab.whyD')}</p>
       </section>
     </div>
+  )
+}
+
+/** The real NSE day the Lab's replay uses: the index and the day's best and worst stock, from the downloaded data. */
+function RealDay() {
+  const { t } = useI18n()
+  const { data, real } = useMarketDay()
+  if (!data || !real) return null
+  const list = quotes(data).sort((a, b) => b.pct - a.pct), best = list[0], worst = list[list.length - 1]
+  return (
+    <Link to="/lab/replay" className="hud flex flex-wrap items-center gap-x-6 gap-y-2 p-4 text-[14px] sm:px-6">
+      <span className="label">{t('mk.board')} · {t('mk.close', { date: dateLabel(data) })}</span>
+      <span>{t('mk.nifty')} <Move pct={indexMove(data)} digits={2} /></span>
+      <span>{best.symbol} <Move pct={best.pct} digits={2} /></span>
+      <span>{worst.symbol} <Move pct={worst.pct} digits={2} /></span>
+      <span className="ml-auto text-soft">{t('mk.replay')} →</span>
+    </Link>
   )
 }

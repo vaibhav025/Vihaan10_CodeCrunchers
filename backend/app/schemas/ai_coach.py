@@ -15,7 +15,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     disclaimer: str
-    intent: str = "general"          # mine | calc | suggest | retire | progress | general
+    intent: str = "general"          # mine | calc | suggest | retire | progress | market | general
     sources: List[str] = []
     provider: str = "private"        # "private" means no outside model was used
     gateway: Optional[str] = None    # "prune" when the request went through the Prune gateway

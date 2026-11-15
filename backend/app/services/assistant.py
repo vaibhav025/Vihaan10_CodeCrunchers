@@ -15,6 +15,7 @@ import re
 from pathlib import Path
 
 from app.config import settings
+from app.services import market_day
 from app.services.ai_service import complete, retrieve_knowledge
 from app.utils.nps_calculator import calculate_nps_corpus
 
@@ -33,6 +34,10 @@ ASSET_WORDS = {"fd": r"\bfds?\b|fixed deposit", "stocks": r"stocks?|shares?|equi
 
 POSSESSIVE = r"\b(my|mine|i have|do i have|have i|i own|mera|meri|mere)\b|मेरा|मेरी|मेरे"
 PERSONAL = POSSESSIVE + r"|\b(i|me|am i|main|mujhe)\b|मैं|मुझे"
+MARKET_WORDS = (r"nifty|sensex|stock ?market|share ?market|\bmarkets?\b|share price|stock price|closing price|top (gainers?|losers?)|"
+                r"शेयर बाज़ार|शेयर बाजार|बाज़ार|बाजार|निफ्टी")
+MY_STOCKS_DAY = (r"\b(stocks?|shares?|holdings?|portfolio)\b.*\b(today|friday|that day|on the day|move|moved|do|did|perform|performed|gain|gained|lose|lost|up|down|change|changed)\b"
+                 r"|शेयर.*(कैसे|आज)")
 STOP = set("a an the is are was what how why when which who do does can could should would will i me my of in on for to and or "
            "with about it this that be have has much many tell please explain give".split())
 
@@ -78,6 +83,11 @@ def detect_intent(q: str) -> str:
         return "calc"
     if re.search(r"\b(xp|level|streak|badges?|rank)\b", s):
         return "progress"
+    if re.search(MARKET_WORDS, s) or (re.search(POSSESSIVE, s) and re.search(MY_STOCKS_DAY, s)):
+        return "market"
+    data = market_day.load()
+    if data and market_day.mentioned(data, q):
+        return "market"
     if re.search(r"should i|suggest|advice|advise|recommend|improve|next step|what (should|can|do) i do|how (can|do|should) i "
                  r"(save|invest|start|improve|reduce|plan|grow)|tips? for me|सलाह|सुझाव|kya kar|क्या कर", s):
         return "suggest"
@@ -191,6 +201,46 @@ def fill(text: str, facts: dict) -> str:
     return text
 
 
+def pct(n: float) -> str:
+    return f"{'+' if n >= 0 else '−'}{abs(n):.2f}%"
+
+
+def market_draft(q: str, money: dict) -> tuple[str, list[str], dict]:
+    """Answer from the real downloaded NSE day. Public prices go in the text; the user's own holdings only as placeholders."""
+    data = market_day.load()
+    if not data:
+        return ("Real market data has not been downloaded on this server yet, so I can't quote prices. "
+                "Run the download script described in the README, then ask again."), [], {}
+    day, ix, quotes = market_day.day_label(data), market_day.index_quote(data), market_day.quotes(data)
+    parts = [f"On {day} (NSE close), the {ix['name']} ended at {ix['price']:,.2f}, {pct(ix['pct'])} from the previous close."]
+    named = market_day.mentioned(data, q)
+    for x in named[:3]:
+        parts.append(f"{x['name']} ({x['symbol']}) closed at ₹{x['price']:,.2f}, {pct(x['pct'])} vs ₹{x['prev']:,.2f}; "
+                     f"its range that day was ₹{x['low']:,.2f} to ₹{x['high']:,.2f}. Of that move, {pct(ix['pct'])} matched the whole market "
+                     f"and {pct(x['pct'] - ix['pct'])} was the stock's own.")
+    facts = {}
+    personal = re.search(POSSESSIVE, q.lower())
+    mine = market_day.linked_holdings(data, money.get("assets", []))
+    if personal or (not named and mine):
+        if mine:
+            value = sum(h["value"] for h in mine)
+            change = sum(h["change"] for h in mine)
+            facts = {"MY_STOCKS_VALUE": inr(value), "MY_STOCKS_DAY_CHANGE": ("+" if change >= 0 else "") + inr(change),
+                     "MY_STOCKS_DAY_PCT": pct(change / (value - change) * 100 if value - change > 0 else 0),
+                     "MY_STOCKS_LINES": "; ".join(f"{h['quote']['name']} {pct(h['quote']['pct'])} ({inr(h['change'])})" for h in mine)}
+            parts.append("Your linked stocks were worth {{MY_STOCKS_VALUE}} at that close, a change of {{MY_STOCKS_DAY_CHANGE}} "
+                         "({{MY_STOCKS_DAY_PCT}}) on the day: {{MY_STOCKS_LINES}}.")
+        else:
+            parts.append("To see how your own stocks moved, open the Tracker, edit a stock holding, and pick its NSE symbol and number of shares.")
+    if not named and not mine:
+        ranked = sorted(quotes, key=lambda x: x["pct"])
+        parts.append("Biggest gainers: " + ", ".join(f"{x['name']} {pct(x['pct'])}" for x in ranked[::-1][:3]) +
+                     ". Biggest fallers: " + ", ".join(f"{x['name']} {pct(x['pct'])}" for x in ranked[:3]) + ".")
+    parts.append("One day's move says little about retirement; what matters is investing steadily for years. "
+                 "This is past data for learning, not a recommendation to buy or sell.")
+    return " ".join(parts), [f"NSE closing prices, {day} (via Yahoo Finance, unofficial)"], facts
+
+
 def build_draft(intent: str, q: str, profile: dict, facts: dict, tips: list[str]) -> tuple[str, list[str]]:
     """The engine's own answer, still holding placeholders. Returns (draft, sources)."""
     s = q.lower()
@@ -249,11 +299,16 @@ async def answer(question: str, history: list[dict], profile: dict, money: dict,
                  language: str = "English", allow_ai: bool = False) -> dict:
     intent = detect_intent(question)
     facts, notes, tips = money_picture(profile, money, extras)
-    draft, sources = build_draft(intent, question, profile, facts, tips)
+    if intent == "market":
+        draft, sources, extra = market_draft(question, money)
+        facts.update(extra)
+    else:
+        draft, sources = build_draft(intent, question, profile, facts, tips)
     reply, provider, gate = fill(draft, facts), "private", {}
 
-    # What-if sums are exact and stay local. Everything else may be phrased by a model, on placeholders only.
-    if allow_ai and intent != "calc":
+    # What-if sums and real market prices must stay exact, so they stay local.
+    # Everything else may be phrased by a model, on placeholders only.
+    if allow_ai and intent not in ("calc", "market"):
         system = SYSTEM.format(language=language, placeholders=", ".join("{{" + k + "}}" for k in facts),
                                notes="; ".join(notes), draft=draft)
         messages = [{"role": m["role"], "content": redact(m["content"])[:1000]} for m in history[-6:]]

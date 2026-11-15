@@ -6,6 +6,7 @@ import { Label } from '../ui/kit'
 import { useI18n } from '../../lib/i18n'
 import { today, useSession } from '../../lib/session'
 import { setMeta } from '../../lib/meta'
+import { useGuide } from '../../guide/GuideProvider'
 import { useToast } from '../../ui/Toast'
 import { api } from '../../lib/api'
 
@@ -25,8 +26,11 @@ export function HowTo({ id }: { id: string }) {
   const { t } = useI18n()
   const key = `pq.howto.${id}`
   const [open, setOpen] = useState(() => { try { return localStorage.getItem(key) !== '1' } catch { return false } })
+  const guide = useGuide()
   const close = () => { setOpen(false); try { localStorage.setItem(key, '1') } catch { /* private mode */ } }
-  if (!open) return <button type="button" className="link !min-h-[44px] gap-1.5 text-soft" onClick={() => setOpen(true)}><Info size={14} strokeWidth={1.6} aria-hidden />{t('howto.show')}</button>
+  // Dada Ji's step-by-step lesson for this game (the hub uses the Lab overview tour)
+  const teach = <button type="button" className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#E9A23B]/70 px-4 text-[14.5px] font-medium text-ink hover:bg-[#E9A23B]/10" onClick={() => guide.startTour(id === 'hub' ? 'lab' : id)}>{t('howto.teach')}</button>
+  if (!open) return <div className="flex flex-wrap items-center gap-x-4 gap-y-1">{teach}<button type="button" className="link !min-h-[44px] gap-1.5 text-soft" onClick={() => setOpen(true)}><Info size={14} strokeWidth={1.6} aria-hidden />{t('howto.show')}</button></div>
   return (
     <section aria-labelledby={`howto-${id}`} className="hud relative border-up/40 p-5 sm:p-6">
       <button type="button" onClick={close} aria-label={t('howto.close')} className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full text-soft hover:text-ink"><X size={17} strokeWidth={1.6} aria-hidden /></button>
@@ -39,7 +43,7 @@ export function HowTo({ id }: { id: string }) {
           </li>
         ))}
       </ol>
-      <button type="button" className="btn-quiet mt-5" onClick={close}>{t('howto.got')}</button>
+      <div className="mt-5 flex flex-wrap gap-2">{teach}<button type="button" className="btn-quiet" onClick={close}>{t('howto.got')}</button></div>
     </section>
   )
 }

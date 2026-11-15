@@ -11,7 +11,7 @@ export default function ScoreRing({ score, size = 168, dark = false, label }: { 
         <circle cx="50" cy="50" r={r} fill="none" stroke={dark ? '#FFFFFF' : tone} strokeWidth="8" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - Math.min(v, 100) / 100)} />
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">
-        <div><p className={`num leading-none ${dark ? 'text-[#FFFFFF]' : 'text-ink'}`} style={{ fontSize: size * 0.36 }}>{Math.round(v)}</p>
+        <div><p className={`num leading-none ${dark ? 'text-ink' : 'text-ink'}`} style={{ fontSize: size * 0.36 }}>{Math.round(v)}</p>
           <p className="label mt-0.5" style={{ fontSize: Math.max(9, size * 0.065) }}>/ 100</p></div>
       </div>
     </div>

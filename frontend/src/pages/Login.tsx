@@ -22,15 +22,15 @@ export default function Login() {
   return <div className="mx-auto grid min-h-[68vh] w-full max-w-[980px] place-items-center px-5 py-10">
     <div className="grid w-full overflow-hidden rounded-xl border border-line bg-card shadow-sm md:grid-cols-[0.9fr_1.1fr]">
       <aside className="relative hidden min-h-[510px] overflow-hidden bg-forest p-9 text-on-forest md:flex md:flex-col md:justify-between">
-        <span aria-hidden className="absolute -right-16 -top-12 h-64 w-64 rounded-full border border-white/15" />
-        <span aria-hidden className="absolute -bottom-28 -left-16 h-72 w-72 rounded-full border border-white/15" />
+        <span aria-hidden className="absolute -right-16 -top-12 h-64 w-64 rounded-full border border-on-forest/15" />
+        <span aria-hidden className="absolute -bottom-28 -left-16 h-72 w-72 rounded-full border border-on-forest/15" />
         <div className="relative">
-          <div className="grid h-12 w-12 place-items-center rounded-lg border border-white/20 bg-white/10"><Lock size={20} strokeWidth={1.5} /></div>
-          <Label className="mt-8 block !text-white/70">A clearer path forward</Label>
+          <div className="grid h-12 w-12 place-items-center rounded-lg border border-on-forest/20 bg-on-forest/10"><Lock size={20} strokeWidth={1.5} /></div>
+          <Label className="mt-8 block !text-on-forest/70">A clearer path forward</Label>
           <h2 className="mt-3 max-w-sm font-serif text-[2.6rem] leading-[1.05]">Your money story, kept in your hands.</h2>
-          <p className="mt-4 max-w-sm leading-relaxed text-white/75">Track your savings, plan for retirement, and pick up where you left off.</p>
+          <p className="mt-4 max-w-sm leading-relaxed text-on-forest/75">Track your savings, plan for retirement, and pick up where you left off.</p>
         </div>
-        <p className="relative text-sm text-white/70">Private account · Encrypted financial tracker</p>
+        <p className="relative text-sm text-on-forest/70">Private account · Encrypted financial tracker</p>
       </aside>
       <form onSubmit={submit} className="p-7 sm:p-10 md:p-12">
         <Label>Welcome back</Label>

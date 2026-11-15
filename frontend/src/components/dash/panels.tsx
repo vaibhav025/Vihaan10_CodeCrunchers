@@ -44,7 +44,7 @@ export function NextStep({ rows }: { rows: LabRow[] | null }) {
   const hello = t(h < 12 ? 'dash.morning' : h < 17 ? 'dash.afternoon' : 'dash.evening', { name: (user?.name ?? '').trim().split(' ')[0] })
   return (
     <m.section {...rise(0)} aria-labelledby="dash-h" className="band p-6 sm:p-9">
-      <div className="relative z-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <div data-guide="next-step" className="relative z-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="min-w-0">
           <h1 id="dash-h" className="text-[clamp(1.9rem,4.6vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">{hello}</h1>
           <p className="label mt-5">{t('dash.next')}{step && step !== 'lab' ? ` · ${t('dash.stepOf', { n: STEPS.indexOf(step) + 1 })}` : ''}</p>
@@ -65,7 +65,7 @@ export function NextStep({ rows }: { rows: LabRow[] | null }) {
         </div>
         {step && <Link to={GO[step]} className="btn w-full gap-2 lg:w-auto">{t(`dash.s.${step}.cta`)}<ArrowUpRight size={17} aria-hidden /></Link>}
       </div>
-      <FutureLine />
+      <div data-guide="future-line"><FutureLine /></div>
     </m.section>
   )
 }
@@ -161,7 +161,7 @@ export function MonthCard({ i }: { i: number }) {
   }, [list])
   const tone = ['bg-ink/[0.07]', 'bg-up/35', 'bg-up/65', 'bg-up']
   return (
-    <m.section {...rise(i)} aria-labelledby="dash-month" className="hud p-5">
+    <m.section {...rise(i)} data-guide="month" aria-labelledby="dash-month" className="hud p-5">
       <div className="flex items-baseline justify-between gap-3"><h2 id="dash-month" className="label">{t('dash.month')}</h2><Label>{t('dash.weeks')}</Label></div>
       <p className="mt-2 flex items-baseline gap-2"><span className="num text-[1.7rem] leading-none text-ink">{list === null ? '…' : rupees(month)}</span><span className="label">{t('dash.logged')}</span></p>
       <div role="img" aria-label={t('dash.heat', { n: count })} className="mt-4 grid grid-flow-col grid-rows-7 gap-[3px]">
@@ -207,7 +207,7 @@ export function TipCard({ i }: { i: number }) {
   const { t } = useI18n()
   const n = (Math.floor(Date.now() / 864e5) % 7) + 1
   return (
-    <m.section {...rise(i)} aria-labelledby="dash-tip" className="hud p-5">
+    <m.section {...rise(i)} data-guide="tip" aria-labelledby="dash-tip" className="hud p-5">
       <h2 id="dash-tip" className="label inline-flex items-center gap-1.5"><Lightbulb size={13} strokeWidth={1.6} aria-hidden className="text-amber" />{t('dash.tip')}</h2>
       <p className="mt-2 text-[16px] leading-relaxed text-ink">{t(`dash.tip.${n}`)}</p>
       <Link to="/coach" className="link mt-2 !min-h-[44px]">{t('dash.ask')} →</Link>

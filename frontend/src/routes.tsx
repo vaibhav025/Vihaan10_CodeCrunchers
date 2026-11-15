@@ -36,12 +36,13 @@ export const Profile = page(() => import('./pages/Profile'))
 export const Privacy = page(() => import('./pages/Privacy'))
 export const Lab = page(() => import('./pages/Lab'))
 export const LabStocks = page(() => import('./pages/LabStocks'))
+export const LabReplay = page(() => import('./pages/LabReplay'))
 export const LabRetire = page(() => import('./pages/LabRetire'))
 export const LabFunds = page(() => import('./pages/LabFunds'))
 export const LabSchemes = page(() => import('./pages/LabSchemes'))
 
 const BY_PATH: Record<string, { preload: () => Promise<void> }> = {
-  '/start': Onboarding, '/login': Login, '/home': PathPage, '/quest': Quest, '/tracker': Tracker, '/coach': Coach, '/profile': Profile, '/lab': Lab, '/lab/stocks': LabStocks, '/lab/retire': LabRetire, '/lab/funds': LabFunds, '/lab/schemes': LabSchemes,
+  '/start': Onboarding, '/login': Login, '/home': PathPage, '/quest': Quest, '/tracker': Tracker, '/coach': Coach, '/profile': Profile, '/lab': Lab, '/lab/stocks': LabStocks, '/lab/replay': LabReplay, '/lab/retire': LabRetire, '/lab/funds': LabFunds, '/lab/schemes': LabSchemes,
 }
 
 /** Loads the chunk for the page being opened, before the first render. */

@@ -79,16 +79,16 @@ export default function Onboarding() {
         <div className="relative z-10">
           <Label>Step {stage + 1} of 4</Label>
           <h1 className="mt-2 text-[clamp(1.9rem,3vw,2.5rem)] leading-[1.08]">Plan the life you retire into.</h1>
-          <p className="mt-3 text-[15px] leading-relaxed text-[#FFFFFF]/80">Four short steps. At the end you get a Retirement Readiness Score built from your own numbers.</p>
+          <p className="mt-3 text-[15px] leading-relaxed text-ink/80">Four short steps. At the end you get a Retirement Readiness Score built from your own numbers.</p>
           <ol className="mt-7 space-y-1">
             {STAGES.map((s, i) => (
               <li key={s.name} className="flex items-center gap-3 py-2">
-                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border text-[13px] transition-colors ${i < stage ? 'border-[#FFFFFF] bg-[#FFFFFF] text-[#0A0A0A]' : i === stage ? 'border-[#FFFFFF] text-[#FFFFFF]' : 'border-white/20 text-white/45'}`}>{i < stage ? <Check size={15} /> : <span className="num">{i + 1}</span>}</span>
-                <span className={`text-[15px] ${i === stage ? 'font-medium text-[#FFFFFF]' : i < stage ? 'text-[#FFFFFF]/85' : 'text-white/45'}`}>{s.name}</span>
+                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border text-[13px] transition-colors ${i < stage ? 'border-ink bg-ink text-paper' : i === stage ? 'border-ink text-ink' : 'border-ink/30 text-soft'}`}>{i < stage ? <Check size={15} /> : <span className="num">{i + 1}</span>}</span>
+                <span className={`text-[15px] ${i === stage ? 'font-medium text-ink' : i < stage ? 'text-ink/85' : 'text-soft'}`}>{s.name}</span>
               </li>
             ))}
           </ol>
-          <p className="mt-7 border-t border-white/15 pt-4 text-[13px] leading-relaxed text-[#FFFFFF]/65"><Shield size={13} className="mr-1.5 inline -translate-y-px" />Your numbers are encrypted before they are stored, and never shared.</p>
+          <p className="mt-7 border-t border-ink/15 pt-4 text-[13px] leading-relaxed text-ink/65"><Shield size={13} className="mr-1.5 inline -translate-y-px" />Your numbers are encrypted before they are stored, and never shared.</p>
         </div>
       </aside>
 

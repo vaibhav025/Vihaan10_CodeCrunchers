@@ -33,12 +33,12 @@ function Card({ id, rules, children }: { id: Scheme; rules: ReactNode; children:
   const { t } = useI18n()
   return (
     <div role="tabpanel" aria-labelledby={`sch-${id}`} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-      <section className="hud p-5 sm:p-6">
+      <section data-guide="gs-rules" className="hud p-5 sm:p-6">
         <h2 id={`sch-${id}`} className="text-[1.6rem] leading-tight text-ink">{t(`lab.g2.${id}.t`)}</h2>
         <p className="mt-2 text-[15px] leading-relaxed text-soft">{t(`lab.g2.${id}.d`)}</p>
         <ul className="mt-3 divide-y divide-line border-y border-line">{rules}</ul>
       </section>
-      <section className="hud p-5 sm:p-6">
+      <section data-guide="gs-calc" className="hud p-5 sm:p-6">
         <Label>{t('lab.g2.calc')}</Label>
         {children}
       </section>
@@ -77,13 +77,13 @@ export default function LabSchemes() {
       <LabHead title={t('lab.g2.title')} sub={t('lab.g2.sub')} />
       <LabNote />
       <HowTo id="schemes" />
-      <Terms keys={['nps', 'apy', 'ppf', 'epf', 'ccd']} />
+      <Terms keys={['nps', 'apy', 'ppf', 'epf', 'ccd', 'lump', 'annuity']} />
       <p className="flex items-start gap-2.5 rounded-md border border-rust/50 bg-paper px-3.5 py-2.5 text-[14px] leading-snug text-ink" role="note">
         <Info size={16} strokeWidth={1.5} aria-hidden className="mt-0.5 shrink-0 text-rust" />
         <span>{t('lab.g2.verifyNote')}</span>
       </p>
 
-      <div className="max-w-xl">
+      <div className="max-w-xl" data-guide="gs-tabs">
         <Segmented label={t('lab.g2.pick')} value={tab} onChange={setTab} options={SCHEMES.map(s => ({ id: s, name: t(`lab.g2.${s}.n`) }))} />
       </div>
 
@@ -221,7 +221,7 @@ function Quiz() {
   }
 
   return (
-    <section aria-labelledby="quiz" className="hud p-5 sm:p-7">
+    <section aria-labelledby="quiz" data-guide="gs-quiz" className="hud p-5 sm:p-7">
       <Label>{t('lab.q.k')}</Label>
       <h2 id="quiz" className="mt-1.5 text-[1.6rem] leading-tight text-ink">{t('lab.q.title')}</h2>
       {at === -1 && (

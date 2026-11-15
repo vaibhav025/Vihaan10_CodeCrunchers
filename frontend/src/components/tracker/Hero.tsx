@@ -28,7 +28,7 @@ export default function Hero({ r, stats, age, started, hasAssets, onAct, onAsk, 
     <section className="band p-6 sm:p-9" aria-labelledby="hero-h">
       <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[auto_minmax(0,1fr)] xl:grid-cols-[auto_minmax(0,1fr)_minmax(0,1.05fr)]">
         <div className="flex flex-col items-center">
-          {started ? <Ring r={r} open={open} onTap={() => setOpen(!open)} /> : <span aria-hidden className="grid h-[176px] w-[176px] place-items-center rounded-full border-2 border-dashed border-white/25 font-serif text-4xl text-white/50">?</span>}
+          {started ? <Ring r={r} open={open} onTap={() => setOpen(!open)} /> : <span aria-hidden className="grid h-[176px] w-[176px] place-items-center rounded-full border-2 border-dashed border-ink/25 font-serif text-4xl text-ink/50">?</span>}
           {started && <p className="label mt-2 text-center">{next ? tc('toNext', lang, { n: next.min - r.score, b: t(`vt.${next.key}`) }) : tc('top', lang)}</p>}
         </div>
         <div className="min-w-0">
@@ -42,19 +42,19 @@ export default function Hero({ r, stats, age, started, hasAssets, onAct, onAsk, 
               {chips.map(([k, v, info, known]) => (
                 <div key={k} className="tile group relative px-3 py-3 transition-transform hover:-translate-y-0.5">
                   <dt className="label flex items-start justify-between gap-1 leading-snug">{k}
-                    <button className="tip-host -m-2 grid h-8 w-8 shrink-0 place-items-center rounded text-white/60 hover:text-white focus-visible:text-white" aria-label={`${tc('info', lang)}: ${k}`}><Info size={14} />
-                      <span role="tooltip" className="tip pointer-events-none absolute left-0 right-0 top-full z-20 mt-1 rounded-md bg-[#000000] p-2.5 text-left text-[13px] normal-case tracking-normal text-[#FFFFFF] opacity-0 shadow-lg transition-opacity">{tc(info, lang)}</span></button></dt>
+                    <button className="tip-host -m-2 grid h-8 w-8 shrink-0 place-items-center rounded text-ink/60 hover:text-ink focus-visible:text-ink" aria-label={`${tc('info', lang)}: ${k}`}><Info size={14} />
+                      <span role="tooltip" className="tip pointer-events-none absolute left-0 right-0 top-full z-20 mt-1 rounded-md bg-[#000000] p-2.5 text-left text-[13px] normal-case tracking-normal text-ink opacity-0 shadow-lg transition-opacity">{tc(info, lang)}</span></button></dt>
                   <dd className="mt-1">{known ? <span className="num text-[clamp(1.2rem,2vw,1.6rem)] leading-none"><CountUp value={v} format={rupeesShort} /></span>
-                    : <span className="mt-1 inline-block rounded border border-dashed border-white/35 px-2 py-1 text-[13px] text-white/70">{tc('addHold', lang)}</span>}</dd>
+                    : <span className="mt-1 inline-block rounded border border-dashed border-ink/35 px-2 py-1 text-[13px] text-ink/70">{tc('addHold', lang)}</span>}</dd>
                 </div>
               ))}
             </dl>
           ) : (
-            <div className="mt-5 rounded-xl border border-white/15 bg-white/5 p-4">
+            <div className="mt-5 rounded-xl border border-ink/15 bg-ink/5 p-4">
               <Label>{tc('startT', lang)}</Label>
               <ol className="mt-2 space-y-2">{([1, 2, 3] as const).map(n => (
-                <li key={n}><button onClick={() => onStart(n)} className="flex min-h-[48px] w-full items-center gap-3 rounded-lg px-2 text-left transition-transform hover:translate-x-1 hover:bg-white/5 focus-visible:bg-white/10 active:scale-[0.99]">
-                  <span className="num grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#FFFFFF] text-[#0A0A0A]">{n}</span><span className="flex-1 text-[15px]">{tc(`s${n}`, lang)}</span><Plus size={16} aria-hidden /></button></li>
+                <li key={n}><button onClick={() => onStart(n)} className="flex min-h-[48px] w-full items-center gap-3 rounded-lg px-2 text-left transition-transform hover:translate-x-1 hover:bg-ink/5 focus-visible:bg-ink/10 active:scale-[0.99]">
+                  <span className="num grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-[#0A0A0A]">{n}</span><span className="flex-1 text-[15px]">{tc(`s${n}`, lang)}</span><Plus size={16} aria-hidden /></button></li>
               ))}</ol>
             </div>
           )}
@@ -63,10 +63,10 @@ export default function Hero({ r, stats, age, started, hasAssets, onAct, onAsk, 
       </div>
       <AnimatePresence initial={false}>
         {open && (
-          <m.ul initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={spring} className="relative z-10 mt-6 grid gap-x-8 gap-y-2 border-t border-white/15 pt-4 md:grid-cols-2" aria-label={t('tr.how')}>
+          <m.ul initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={spring} className="relative z-10 mt-6 grid gap-x-8 gap-y-2 border-t border-ink/15 pt-4 md:grid-cols-2" aria-label={t('tr.how')}>
             {r.parts.map(p => (
-              <li key={p.key}><button onClick={() => onAct(p.key)} className="flex w-full items-baseline justify-between gap-4 rounded px-2 py-1.5 text-left hover:bg-white/5 focus-visible:bg-white/10">
-                <span><span className="label block">{t(`tr.p.${p.key}`)}</span><span className="text-[15px] text-[#FFFFFF]/85">{t(`tr.d.${p.key}`, p.vars)}</span></span>
+              <li key={p.key}><button onClick={() => onAct(p.key)} className="flex w-full items-baseline justify-between gap-4 rounded px-2 py-1.5 text-left hover:bg-ink/5 focus-visible:bg-ink/10">
+                <span><span className="label block">{t(`tr.p.${p.key}`)}</span><span className="text-[15px] text-ink/85">{t(`tr.d.${p.key}`, p.vars)}</span></span>
                 <span className="num shrink-0 text-lg">{p.got.toFixed(1)}<span className="label"> / {p.max}</span></span></button></li>
             ))}
             <li className="label md:col-span-2">{tc('note', lang)}</li>
@@ -96,7 +96,7 @@ function Ring({ r, open, onTap }: { r: Readiness; open: boolean; onTap: () => vo
           )
         })}
       </svg>
-      <span className="absolute inset-0 grid place-items-center text-center"><span><span className="num block text-[60px] leading-none text-[#FFFFFF]" aria-live="polite">{Math.round(v)}</span><span className="label">/ 100</span></span></span>
+      <span className="absolute inset-0 grid place-items-center text-center"><span><span className="num block text-[60px] leading-none text-ink" aria-live="polite">{Math.round(v)}</span><span className="label">/ 100</span></span></span>
     </button>
   )
 }

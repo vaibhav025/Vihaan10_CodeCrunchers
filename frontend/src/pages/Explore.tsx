@@ -74,7 +74,7 @@ export default function Explore() {
       )}
 
       <button onClick={() => nav('/home')} aria-label={t('ls.close')}
-        className={`absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded border ${begun ? 'border-line bg-card text-ink' : 'border-white/15 text-[#ECE9DA]'}`}><X size={20} aria-hidden /></button>
+        className={`absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded border ${begun ? 'border-line bg-card text-ink' : 'border-ink/15 text-[#ECE9DA]'}`}><X size={20} aria-hidden /></button>
 
       <AnimatePresence>
         {!begun && (

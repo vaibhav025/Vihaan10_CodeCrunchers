@@ -48,12 +48,12 @@ export default function ScamShield() {
           <div className="max-w-lg">
             <Label>{t('sh.week')}</Label>
             <h1 className="mt-2 text-[clamp(2rem,4.5vw,3rem)] leading-[1.05]">{t('sh.title')}</h1>
-            <p className="mt-2 text-[16px] leading-relaxed text-[#FFFFFF]/80">{t('sh.sub')}</p>
+            <p className="mt-2 text-[16px] leading-relaxed text-ink/80">{t('sh.sub')}</p>
           </div>
-          <span aria-hidden className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/15"><Shield size={44} strokeWidth={1.3} className="text-[#FFFFFF]" /></span>
+          <span aria-hidden className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-ink/10 ring-1 ring-white/15"><Shield size={44} strokeWidth={1.3} className="text-ink" /></span>
         </div>
         <div className="relative z-10 mt-6 flex gap-2" role="progressbar" aria-valuemin={0} aria-valuemax={3} aria-valuenow={finished ? 3 : i}>
-          {set.map((x, k) => <span key={x.id} className={`h-2 flex-1 rounded-full ${finished || k < i ? 'bg-[#FFFFFF]' : k === i ? 'bg-white/45' : 'bg-white/12'}`} />)}
+          {set.map((x, k) => <span key={x.id} className={`h-2 flex-1 rounded-full ${finished || k < i ? 'bg-ink' : k === i ? 'bg-ink/45' : 'bg-ink/12'}`} />)}
         </div>
       </section>
 

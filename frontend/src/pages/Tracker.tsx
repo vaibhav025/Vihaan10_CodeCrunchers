@@ -9,6 +9,8 @@ import Hero from '../components/tracker/Hero'
 import { tc } from '../components/tracker/strings'
 import { Accuracy, ActionSheet, Lessons, markWeek, NextMoves, Quests, Weekly, WhatIf } from '../components/tracker/Body'
 import QuickScore from '../components/tracker/QuickScore'
+import MarketCard from '../components/tracker/MarketCard'
+import { dateLabel, isLinked, quoteOf, quotes, useMarketDay } from '../lib/marketDay'
 import { useToast } from '../ui/Toast'
 import { spring } from '../ui/motion'
 import { useI18n } from '../lib/i18n'
@@ -98,16 +100,16 @@ export default function Tracker() {
 
   return (
     <div className="mx-auto w-full max-w-[1320px] px-5 sm:px-8">
-      <Hero r={r} stats={{ now: tot.netWorth, future: tot.future, real: tot.real }} age={user.retirement_age} started={started} hasAssets={money.assets.length > 0}
-        onAct={act} onAsk={ask} onStart={n => (n === 1 ? goAcc('income') : n === 2 ? setEdit({ type: 'cash' }) : setQuick(true))} />
+      <div data-guide="tracker-score"><Hero r={r} stats={{ now: tot.netWorth, future: tot.future, real: tot.real }} age={user.retirement_age} started={started} hasAssets={money.assets.length > 0}
+        onAct={act} onAsk={ask} onStart={n => (n === 1 ? goAcc('income') : n === 2 ? setEdit({ type: 'cash' }) : setQuick(true))} /></div>
 
-      <m.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.06 }}><NextMoves r={r} started={started} onAct={act} onStart={() => setQuick(true)} /></m.div>
+      <m.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.06 }} data-guide="tracker-moves"><NextMoves r={r} started={started} onAct={act} onStart={() => setQuick(true)} /></m.div>
 
 
       <m.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.12 }} className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-8">
           {/* the vault: one slot per kind of asset */}
-          <section aria-labelledby="vault">
+          <section aria-labelledby="vault" data-guide="tracker-vault">
             <div className="flex items-baseline justify-between gap-3"><h2 id="vault" className="text-[1.8rem] text-ink">{t('tr.vault')}</h2><Label>{tot.byType.length} / {TYPES.length} {t('tr.slots')}</Label></div>
             <div className="grid gap-x-5 xl:grid-cols-3">
             {SHELVES.map(sh => {
@@ -155,7 +157,7 @@ export default function Tracker() {
                     <button onClick={() => setEdit({ type: a.type, id: a.id })} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-haze">
                       <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: TINT[a.type] }} />
                       <span className="min-w-0 flex-1"><span className="block truncate text-ink">{a.name || t(`as.${a.type}`)}</span>
-                        <span className="label block truncate">{t(`as.${a.type}`)} · {rateOf(a)}%{a.monthly ? ` · +${rupees(a.monthly)}${t('common.perMonth')}` : ''}</span></span>
+                        <span className="label block truncate">{isLinked(a) ? `${a.symbol} · ${t('mk.shares', { n: a.qty! })}` : t(`as.${a.type}`)} · {rateOf(a)}%{a.monthly ? ` · +${rupees(a.monthly)}${t('common.perMonth')}` : ''}</span></span>
                       <span className="text-right"><span className="num block text-lg text-ink">{rupeesShort(a.value)}</span><span className="label block">→ {rupeesShort(real(a))}</span></span>
                     </button>
                   </li>
@@ -170,6 +172,7 @@ export default function Tracker() {
         </div>
 
         <aside className="space-y-5">
+          <MarketCard onLink={() => setEdit({ type: 'stocks', id: money.assets.find(a => a.type === 'stocks' && !isLinked(a))?.id })} />
           <Weekly onOpen={() => goAcc('income')} />
           <Accuracy money={money} openKey={accOpen} setOpenKey={setAccOpen} save={save} />
           <button className="link" onClick={() => setSheet(true)}>{t('tr.assume')}</button>
@@ -186,7 +189,7 @@ export default function Tracker() {
               onClick={e => e.stopPropagation()} className="surface-float max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl p-6 sm:max-w-lg sm:rounded-2xl">
               <div className="mb-2 flex items-center justify-between"><Label>{t('tr.accN', { n: added })}</Label>
                 <button onClick={() => setSheet(false)} aria-label={t('ls.close')} className="grid h-11 w-11 place-items-center rounded text-soft hover:text-ink"><X size={20} /></button></div>
-          <section aria-labelledby="flow">
+          <section aria-labelledby="flow" data-guide="tracker-flow">
             <h2 id="flow" className="text-[1.5rem] text-ink">{t('tr.flow')}</h2>
             <div className="mt-4 grid grid-cols-2 gap-3">
               {num('income', t('tr.income'))}{num('expenses', t('tr.expenses'))}{num('emi', t('tr.emi'))}{num('loans', t('tr.loans'))}
@@ -251,7 +254,12 @@ function Editor({ type, id, years, onClose, onFirst }: { type: AssetType; id?: s
   const [value, setValue] = useState(cur?.value ? String(cur.value) : '')
   const [monthly, setMonthly] = useState(cur?.monthly ? String(cur.monthly) : '')
   const [rate, setRate] = useState(cur?.rate !== undefined ? String(cur.rate) : '')
-  const a: Asset = { at: Date.now(), id: cur?.id ?? 'a' + Date.now(), type: kind, value: Number(value) || 0, monthly: Number(monthly) || 0, ...(name.trim() ? { name: name.trim() } : {}), ...(rate !== '' ? { rate: Math.min(Number(rate) || 0, 30) } : {}) }
+  const { data: mkt, real } = useMarketDay()
+  const [sym, setSym] = useState(cur?.symbol ?? '')
+  const [qty, setQty] = useState(cur?.qty ? String(cur.qty) : '')
+  const q = kind === 'stocks' && real && mkt ? quoteOf(mkt, sym) : null
+  const linkedValue = q && Number(qty) > 0 ? Math.round(Number(qty) * q.price) : null
+  const a: Asset = { at: Date.now(), id: cur?.id ?? 'a' + Date.now(), type: kind, value: linkedValue ?? (Number(value) || 0), ...(linkedValue !== null ? { symbol: sym, qty: Number(qty) } : {}), monthly: Number(monthly) || 0, ...(name.trim() ? { name: name.trim() } : q ? { name: q.name } : {}), ...(rate !== '' ? { rate: Math.min(Number(rate) || 0, 30) } : {}) }
   const fv = futureValue(a, years)
   const commit = (remove = false) => {
     const rest = money.assets.filter(x => x.id !== a.id)
@@ -278,9 +286,22 @@ function Editor({ type, id, years, onClose, onFirst }: { type: AssetType; id?: s
           <div><label htmlFor="kind" className="label">{t('tr.type')}</label>
             <select id="kind" className="field mt-1" value={kind} onChange={e => setKind(e.target.value as AssetType)}>{TYPES.map(x => <option key={x} value={x}>{t(`as.${x}`)}</option>)}</select></div>
           <div><label htmlFor="nm" className="label">{t('tr.name')}</label><input id="nm" className="field mt-1" value={name} maxLength={30} onChange={e => setName(e.target.value)} placeholder={t(`as.${kind}`)} /></div>
+          {kind === 'stocks' && real && mkt && (
+            <div className="col-span-2 grid grid-cols-[minmax(0,1fr)_7rem] gap-3">
+              <div><label htmlFor="sym" className="label">{t('mk.field')}</label>
+                <select id="sym" className="field mt-1" value={sym} onChange={e => setSym(e.target.value)}>
+                  <option value="">{t('mk.notLinked')}</option>
+                  {quotes(mkt).map(x => <option key={x.symbol} value={x.symbol}>{x.name} ({x.symbol})</option>)}
+                </select></div>
+              {sym && <div><label htmlFor="qty" className="label">{t('mk.qty')}</label><input id="qty" inputMode="numeric" className="field mt-1" value={qty} placeholder="0" onChange={e => setQty(e.target.value.replace(/[^\d]/g, ''))} /></div>}
+            </div>
+          )}
+          {linkedValue !== null && q && mkt
+            ? <p className="col-span-2 rounded-lg bg-haze p-3 text-[14px] text-ink">{t('mk.valueAt', { date: dateLabel(mkt), value: rupees(linkedValue), qty, price: rupees(q.price) })}</p>
+            : (
           <div className="col-span-2">{field('val', t('tr.value'), value, setValue)}
             <input type="range" aria-label={t('tr.value')} min={0} max={1000000} step={5000} value={Math.min(Number(value) || 0, 1000000)} onChange={e => setValue(e.target.value)} className="mt-2 h-8 w-full accent-[rgb(var(--forest))]" />
-            <div className="mt-1 flex flex-wrap gap-1.5">{[10000, 50000, 100000, 500000].map(v => <button type="button" key={v} aria-pressed={Number(value) === v} onClick={() => setValue(String(v))} className={`min-h-[36px] rounded-full border px-3 font-mono text-[12px] ${Number(value) === v ? 'border-forest bg-haze text-forest' : 'border-line hover:border-forest'}`}>{rupeesShort(v)}</button>)}</div></div>
+            <div className="mt-1 flex flex-wrap gap-1.5">{[10000, 50000, 100000, 500000].map(v => <button type="button" key={v} aria-pressed={Number(value) === v} onClick={() => setValue(String(v))} className={`min-h-[36px] rounded-full border px-3 font-mono text-[12px] ${Number(value) === v ? 'border-forest bg-haze text-forest' : 'border-line hover:border-forest'}`}>{rupeesShort(v)}</button>)}</div></div>)}
           {field('mon', t('tr.monthly'), monthly, setMonthly)}
           <div>{field('rt', t('tr.rateField'), rate, setRate, '%', String(CLASS[kind].rate))}</div>
         </div>

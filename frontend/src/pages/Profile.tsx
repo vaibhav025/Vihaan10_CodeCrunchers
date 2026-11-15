@@ -24,7 +24,7 @@ export default function Profile() {
   const { t, lang, setLang } = useI18n()
   const { user, progress, refresh, reset } = useSession()
   const [editing, setEditing] = useState(false)
-  const [theme, setTheme] = useTheme()
+  const [, setTheme, themePref] = useTheme()
   const reduce = useReduceMotion()
   const meta = useMeta()
   const nav = useNavigate()
@@ -66,20 +66,20 @@ export default function Profile() {
               <circle cx="66" cy="66" r="60" fill="none" stroke="#FFFFFF" strokeWidth="6" strokeLinecap="round" strokeDasharray={377} strokeDashoffset={377 * (1 - lv.pct / 100)} />
             </svg>
             <Avatar wear={meta.equipped} />
-            <span className="num absolute -bottom-1 -right-1 grid h-11 w-11 place-items-center rounded-full bg-[#FFFFFF] text-[22px] text-[#0A0A0A] ring-4 ring-[#0A0A0A]">{lv.level}</span>
+            <span className="num absolute -bottom-1 -right-1 grid h-11 w-11 place-items-center rounded-full bg-ink text-[22px] text-[#0A0A0A] ring-4 ring-[#0A0A0A]">{lv.level}</span>
           </div>
           <div className="min-w-0 text-center lg:text-left">
             <Label>{t('pro.title')}</Label>
             <h1 className={`mt-1 leading-[1.05] [overflow-wrap:anywhere] ${user.name.length > 16 ? 'text-[clamp(1.8rem,3.4vw,2.6rem)]' : 'text-[clamp(2.4rem,5vw,3.8rem)]'}`} title={user.name}>{user.name}</h1>
-            <button onClick={() => setEditing(true)} className="mt-2 inline-flex min-h-[40px] items-center gap-2 rounded-md border border-white/25 px-3.5 text-[14px] text-[#FFFFFF] transition-colors hover:border-[#FFFFFF] hover:bg-white/5 focus-visible:border-[#FFFFFF]">
+            <button data-guide="profile-edit" onClick={() => setEditing(true)} className="mt-2 inline-flex min-h-[40px] items-center gap-2 rounded-md border border-ink/25 px-3.5 text-[14px] text-ink transition-colors hover:border-ink hover:bg-ink/5 focus-visible:border-ink">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z" /></svg>Edit profile
             </button>
             <div className="mt-3 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
               <StateChip state={user.avatar_state} />
               <Label>{t('pro.level', { n: pad2(lv.level) })} · {lv.title}</Label>
             </div>
-            <div className="mx-auto mt-4 h-2 max-w-md overflow-hidden rounded-full bg-white/15 lg:mx-0" role="progressbar" aria-valuenow={lv.pct} aria-valuemin={0} aria-valuemax={100}>
-              <div className="h-full origin-left rounded-full bg-[#FFFFFF] transition-transform duration-700" style={{ transform: `scaleX(${lv.pct / 100})` }} />
+            <div className="mx-auto mt-4 h-2 max-w-md overflow-hidden rounded-full bg-ink/15 lg:mx-0" role="progressbar" aria-valuenow={lv.pct} aria-valuemin={0} aria-valuemax={100}>
+              <div className="h-full origin-left rounded-full bg-ink transition-transform duration-700" style={{ transform: `scaleX(${lv.pct / 100})` }} />
             </div>
             <p className="label mt-2">{lv.next ? t('home.toNext', { xp: lv.toNext, title: LEVEL_TITLES[lv.level] }) : t('home.max')}</p>
           </div>
@@ -92,16 +92,16 @@ export default function Profile() {
           </dl>
         </div>
         {/* this week's lanterns */}
-        <div className="relative z-10 mt-7 flex items-center gap-3 border-t border-white/10 pt-5">
+        <div className="relative z-10 mt-7 flex items-center gap-3 border-t border-ink/10 pt-5">
           <Label className="shrink-0">{t('home.lanterns')}</Label>
           <div className="flex flex-1 gap-2" role="img" aria-label={`${Math.min(progress.streak, 7)} / 7`}>
-            {Array.from({ length: 7 }, (_, i) => <span key={i} className={`h-3 flex-1 rounded-full ${i < progress.streak ? 'bg-[#FFFFFF] shadow-[0_0_14px_rgb(240_182_122/0.8)]' : 'bg-white/10'}`} />)}
+            {Array.from({ length: 7 }, (_, i) => <span key={i} className={`h-3 flex-1 rounded-full ${i < progress.streak ? 'bg-ink shadow-[0_0_14px_rgb(240_182_122/0.8)]' : 'bg-ink/10'}`} />)}
           </div>
         </div>
       </header>
 
       <div className="grid gap-12 lg:grid-cols-2">
-        <section aria-labelledby="con">
+        <section aria-labelledby="con" data-guide="contrib-log">
           <div className="flex items-baseline justify-between gap-3 border-b border-line pb-3">
             <h2 id="con" className="text-[1.9rem] text-ink">{t('pro.contrib')}</h2>
             <Label>{t('pro.total')} · {rupees(history?.total ?? 0)}</Label>
@@ -130,7 +130,7 @@ export default function Profile() {
           )}
         </section>
 
-        <section aria-labelledby="brd">
+        <section aria-labelledby="brd" data-guide="leaderboard">
           <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
             <h2 id="brd" className="text-[1.9rem] text-ink">{t('pro.board')}</h2>
             <div role="radiogroup" aria-label={t('pro.board')} className="flex">
@@ -157,7 +157,7 @@ export default function Profile() {
         </section>
       </div>
 
-      <section aria-labelledby="set" className="border-t border-line pt-6">
+      <section aria-labelledby="set" data-guide="settings-lang" className="border-t border-line pt-6">
         <h2 id="set" className="text-[1.9rem] text-ink">{t('pro.settings')}</h2>
         <div className="mt-5 grid gap-6 sm:grid-cols-2">
           <fieldset>
@@ -166,14 +166,14 @@ export default function Profile() {
           </fieldset>
           <fieldset>
             <legend className="label">{t('pro.theme')}</legend>
-            <Segmented label={t('pro.theme')} options={[{ id: 'light' as const, name: t('pro.light') }, { id: 'dark' as const, name: t('pro.dark') }]} value={theme} onChange={setTheme} />
+            <Segmented label={t('pro.theme')} options={[{ id: 'light' as const, name: t('pro.light') }, { id: 'dark' as const, name: t('pro.dark') }, { id: 'system' as const, name: t('pro.system') }]} value={themePref} onChange={setTheme} />
           </fieldset>
         </div>
         <label className="mt-6 flex items-center gap-3 text-ink"><input type="checkbox" className="h-5 w-5 accent-[rgb(var(--forest))]" checked={reduce} onChange={e => setReduceMotion(e.target.checked)} />{t('set.reduce')}</label>
         <label className="mt-5 flex items-start gap-3 text-ink"><input type="checkbox" className="mt-1 h-5 w-5 accent-[rgb(var(--forest))]" checked={user.ai_consent} onChange={e => { const value = e.target.checked; api.update({ ai_consent: value }).then(() => refresh()).catch(() => {}) }} /><span><strong>Allow AI coach provider</strong><span className="block text-sm text-soft">With consent, an AI model helps word the answers. It sees your question with amounts and IDs masked, never your figures: those are filled in on our server.</span></span></label>
         <label className="mt-5 flex items-start gap-3 text-ink"><input type="checkbox" className="mt-1 h-5 w-5 accent-[rgb(var(--forest))]" checked={user.show_on_leaderboard} onChange={e => { const value = e.target.checked; api.update({ show_on_leaderboard: value }).then(() => refresh()).catch(() => {}) }} /><span>Show me on the leaderboard using my public handle</span></label>
         <label className="mt-3 block text-sm text-soft">Public handle<input className="field mt-1" maxLength={32} placeholder="SavvyTiger42" defaultValue={user.public_handle ?? ''} onBlur={e => api.update({ public_handle: e.target.value || null }).catch(() => {})} /></label>
-        <button className="link mt-6" onClick={() => { if (window.confirm(`${t('pro.reset')}? ${t('pro.resetNote')}`)) { reset(); nav('/') } }}>{t('pro.reset')}</button>
+        <button data-guide="reset-device" className="link mt-6" onClick={() => { if (window.confirm(`${t('pro.reset')}? ${t('pro.resetNote')}`)) { reset(); nav('/') } }}>{t('pro.reset')}</button>
         <p className="text-[13px] text-soft">{t('pro.resetNote')}</p>
       </section>
       <AnimatePresence>{editing && <EditProfile onClose={() => setEditing(false)} onSaved={() => { setEditing(false); refresh() }} />}</AnimatePresence>

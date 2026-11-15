@@ -39,7 +39,7 @@ export function WhyPanel({ m, index }: { m: Market; index: number }) {
   }
 
   return (
-    <section aria-labelledby="why" className="hud p-5 sm:p-6">
+    <section aria-labelledby="why" data-guide="st-why" className="hud p-5 sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="why" className="text-[1.45rem] text-ink">{t('lab.s.why')}</h2>
         <span className="text-[15px] text-soft">{c.name} · <Move pct={pct(p.total)} digits={2} className="font-medium" /></span>
@@ -109,7 +109,7 @@ export function NewsRound({ m, seed, onRelease, onScore }: {
   const reset = () => { setRound(r => r + 1); setEvent(null); setMoved(null); setCalls(Object.fromEntries(SECTORS.map(s => [s, 'flat'])) as Record<Sector, Direction>); setStage('pick') }
 
   return (
-    <section aria-labelledby="nr" className="hud p-5 sm:p-6">
+    <section aria-labelledby="nr" data-guide="st-news" className="hud p-5 sm:p-6">
       <Label>{t('lab.nr.k')}</Label>
       <h2 id="nr" className="mt-1.5 text-[1.6rem] leading-tight text-ink">{t('lab.nr.title')}</h2>
 

@@ -11,7 +11,7 @@ export default function Pillars({ parts, reveal = false, className = '' }: { par
       {parts.map((p, i) => (
         <li key={p.key} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end">
           <span className="num text-[15px] leading-none">{Math.round(p.got)}<span className="label">/{p.max}</span></span>
-          <span className="relative mt-1.5 flex w-full flex-1 items-end rounded-t-md bg-white/[0.06]">
+          <span className="relative mt-1.5 flex w-full flex-1 items-end rounded-t-md bg-ink/[0.06]">
             <m.span className="pillar block h-full w-full origin-bottom rounded-t-md" initial={{ scaleY: 0.03 }} animate={{ scaleY: Math.max(p.got / p.max, 0.03) }} transition={{ ...spring, delay: reveal ? 0.4 + i * 0.18 : 0 }} />
           </span>
           {/* narrow phones: drop the tracking and size a step so six names fit without clipping */}

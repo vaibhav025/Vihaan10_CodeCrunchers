@@ -10,7 +10,9 @@
     "lint": "tsc --noEmit && eslint .",
     "preview": "vite preview",
     "analyze": "vite build --mode analyze",
-    "test": "vitest run"
+    "test": "vitest run",
+    "guide:check": "node scripts/guide-check.mjs",
+    "theme:check": "node scripts/theme-check.mjs"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",

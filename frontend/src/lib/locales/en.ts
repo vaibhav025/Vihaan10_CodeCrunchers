@@ -1,10 +1,14 @@
 import uxEn from './ux.en'
 import labEn from './lab.en'
 import lab2En from './lab2.en'
+import replayEn from './replay.en'
+import marketEn from './market.en'
 
 const en: Record<string, string> = {
   ...labEn,
   ...lab2En,
+  ...replayEn,
+  ...marketEn,
   'vt.starter': 'Starter',
   'vt.foundation': 'Foundation Builder',
   'vt.steady': 'Steady Saver',

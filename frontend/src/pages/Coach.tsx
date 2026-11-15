@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import WorldStill from '../components/world/WorldStill'
 import { spring } from '../ui/motion'
@@ -6,8 +6,11 @@ import { prefersLessMotion } from '../lib/motionPref'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { answerOffline, factSheet, retrieve } from '../lib/rag'
 import { getMoney } from '../lib/tracker'
-import { Check, Coins, Info, Mic, Plus, RotateCcw, Square, Volume2 } from '../components/ui/icons'
+import { dateLabel, isLinked, useMarketDay } from '../lib/marketDay'
+import { ArrowDown, ArrowUp, Check, Coins, Lock, Mic, Plus, RotateCcw, Square, Volume2, X } from '../components/ui/icons'
+import RoadBackdrop from '../components/RoadBackdrop'
 import Segmented from '../ui/Segmented'
+import CoachDisclaimer from '../components/CoachDisclaimer'
 import { useToast } from '../ui/Toast'
 import { Sidekick } from '../game/character/Character'
 import { tc } from '../components/tracker/strings'
@@ -26,7 +29,6 @@ interface Msg { role: 'user' | 'assistant'; content: string; at: string; cite?: 
 type Topic = 'money' | 'tax' | 'retire' | 'risk'
 const TOPICS: Topic[] = ['money', 'tax', 'retire', 'risk']
 const SAVE = /how much|save|बचा|बचत|कितना|किती/
-const topicOf = (q: string): Topic => (/tax|80c|कर|टैक्स/i.test(q) ? 'tax' : /nps|tier|retire|pension|रिटायर|निवृत्त|पेंशन|पेन्शन/i.test(q) ? 'retire' : /risk|insur|spread|term|बीमा|विमा|जोखि/i.test(q) ? 'risk' : 'money')
 /** Where a source chip links to. Dates are when the note was last checked against that site. */
 const srcLink = (x: string) => (/pfrda|nps|tier|pension|पेंशन/i.test(x) ? 'https://www.pfrda.org.in' : /tax|80c|कर/i.test(x) ? 'https://incometaxindia.gov.in' : null)
 const REVIEWED = '2026-06'
@@ -55,6 +57,7 @@ const NOTES: Record<'what' | 'tax' | 'tier', Record<Lang, string>> = {
 export default function Coach() {
   const { t, lang } = useI18n()
   const { user, refresh } = useSession()
+  const market = useMarketDay()
   const [msgs, setMsgs] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
@@ -74,11 +77,71 @@ export default function Coach() {
   const [fb, setFb] = useState<Record<string, 1 | -1>>(() => { try { return JSON.parse(localStorage.getItem('pq.coach.fb') ?? '{}') } catch { return {} } })
   useEffect(() => { if (loc.state?.ask) setInput(loc.state.ask) }, [loc.state?.ask])
   useEffect(() => { const on = () => setOnline(true), off = () => setOnline(false); addEventListener('online', on); addEventListener('offline', off); return () => { removeEventListener('online', on); removeEventListener('offline', off) } }, [])
-  const end = useRef<HTMLDivElement>(null)
   const rec = useRef<any>(null)
   const SR = typeof window !== 'undefined' ? ((window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition) : null
 
-  useEffect(() => { end.current?.scrollIntoView({ block: 'nearest' }) }, [msgs, busy])
+  // --- scrolling: the chat card has a fixed height; a new question is pinned near the top and nothing else moves the list
+  const list = useRef<HTMLDivElement>(null), lastTurn = useRef<HTMLElement>(null), body = useRef<HTMLDivElement>(null), ta = useRef<HTMLTextAreaElement>(null)
+  const pin = useRef(false), manual = useRef(false), req = useRef(0)
+  const [listH, setListH] = useState(0)
+  const [jump, setJump] = useState(false)       // the answer continues below the visible area
+  const [stuck, setStuck] = useState(false)     // the question has scrolled out above the top
+  const [priv, setPriv] = useState(false)
+  const [topics, setTopics] = useState(false)
+  const [said, setSaid] = useState('')
+  const calm = prefersLessMotion()
+  const pinQuestion = useCallback(() => { const l = list.current, tn = lastTurn.current; if (l && tn) l.scrollTo({ top: tn.offsetTop - 12, behavior: calm ? 'auto' : 'smooth' }) }, [calm])
+  const measure = useCallback(() => {
+    const l = list.current, b = body.current
+    if (!l) return
+    l.style.setProperty('--rb-s', String(l.scrollHeight > l.clientHeight ? l.scrollTop / (l.scrollHeight - l.clientHeight) : 0))
+    if (!b) { setJump(false); return }
+    setJump(b.getBoundingClientRect().bottom > l.getBoundingClientRect().bottom + 24)
+  }, [])
+  useLayoutEffect(() => {
+    const l = list.current; if (!l) return
+    const ro = new ResizeObserver(() => { setListH(l.clientHeight); measure() }); ro.observe(l); if (body.current) ro.observe(body.current)
+    return () => ro.disconnect()
+  }, [measure, msgs.length, busy])
+  // after a send: wait two frames for the new turn to lay out, then put the question 12px from the top
+  useEffect(() => {
+    if (!pin.current) return
+    pin.current = false
+    let b = 0; const a = requestAnimationFrame(() => { b = requestAnimationFrame(pinQuestion) })
+    return () => { cancelAnimationFrame(a); cancelAnimationFrame(b) }
+  }, [msgs.length, pinQuestion])
+  // wheel, touch and scroll keys mean the reader is in charge until the next send
+  useEffect(() => {
+    const l = list.current; if (!l) return
+    const hand = () => { manual.current = true }
+    const keys = (e: KeyboardEvent) => { if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown'].includes(e.key)) manual.current = true }
+    l.addEventListener('wheel', hand, { passive: true }); l.addEventListener('touchmove', hand, { passive: true }); l.addEventListener('keydown', keys); l.addEventListener('scroll', measure, { passive: true })
+    return () => { l.removeEventListener('wheel', hand); l.removeEventListener('touchmove', hand); l.removeEventListener('keydown', keys); l.removeEventListener('scroll', measure) }
+  }, [measure])
+  // the sticky question bar appears when the pinned question leaves through the top
+  useEffect(() => {
+    const l = list.current, q = lastTurn.current?.querySelector('[data-q]')
+    if (!l || !q) { setStuck(false); return }
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < (e.rootBounds?.top ?? 0) + 8), { root: l, threshold: 0 })
+    io.observe(q); return () => io.disconnect()
+  }, [msgs.length])
+  // phone keyboard: keep the card inside the visible viewport and re-pin the question
+  useEffect(() => {
+    const vv = window.visualViewport; if (!vv) return
+    const on = () => { document.documentElement.style.setProperty('--vvh', `${vv.height}px`); if (!manual.current && msgs.length) pinQuestion() }
+    vv.addEventListener('resize', on); return () => { vv.removeEventListener('resize', on); document.documentElement.style.removeProperty('--vvh') }
+  }, [pinQuestion, msgs.length])
+  const stop = useCallback(() => { req.current++; setBusy(false) }, [])
+  // shortcuts: "/" focuses the box, Esc stops a pending answer; the pointer nudges the backdrop on fine pointers
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && busy) stop()
+      if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement).tagName)) { e.preventDefault(); ta.current?.focus() }
+    }
+    document.addEventListener('keydown', k); return () => document.removeEventListener('keydown', k)
+  }, [busy, stop])
+  const grow = () => { const el = ta.current; if (el) { el.style.height = 'auto'; el.style.height = `${el.scrollHeight + 2}px` } }
+  useEffect(grow, [input])
   useEffect(() => () => { rec.current?.abort?.(); window.speechSynthesis?.cancel() }, [])
 
   /** Answer from the field notes; the numbers come from the calculator API. */
@@ -108,11 +171,11 @@ export default function Coach() {
     return NOTES.what[lang]
   }
 
-  const followUps = (q: string) => { const tp = topicOf(q); return [...[1, 2].map(n => tc(`st_${tp}${n}`, lang)), ...TOPICS.filter(x => x !== tp).map(x => tc(`st_${x}1`, lang))].filter(x => x !== q).slice(0, 3) }
-
   async function send(text: string) {
     const q = text.trim()
     if (!q || busy) return
+    const id = ++req.current
+    pin.current = true; manual.current = false; setTopics(false); ta.current?.focus()
     const history = msgs.filter(m => !m.err).map(({ role, content }) => ({ role, content }))
     setMsgs(m => [...m.filter(x => !x.err), { role: 'user', content: q, at: now() }])
     setInput(''); setBusy(true); setLastQ(q)
@@ -126,6 +189,7 @@ export default function Coach() {
       // The server computes every figure itself; an outside model, if allowed, only ever sees placeholders.
       const safeHistory = history.filter(m => m.role === 'user').slice(-6)
       const r = user && online ? await api.chat(q.slice(0, 1000), safeHistory) : null
+      if (id !== req.current) return // stopped
       if (r) { reply = r.reply; if (r.sources?.length) sources = r.sources; setOffline(r.provider === 'private'); if (SAVE.test(q.toLowerCase()) && user) await briefing(q).catch(() => '') }
       else {
         // no AI connected: the built-in adviser answers from the same retrieved notes (and the tracker, if allowed)
@@ -135,10 +199,12 @@ export default function Coach() {
         else { const a = answerOffline(q, user, docs); reply = a.text; cite = a.cite }
       }
     } catch {
+      if (id !== req.current) return
       setMsgs(m => [...m, { role: 'assistant', content: tc('failed', lang), at: now(), err: true }]); setBusy(false); cite = undefined; fig = undefined; return
     }
-    const msg: Msg = { role: 'assistant', content: reply, at: now(), cite, fig, sources, follow: followUps(q) } // capture before the reset below
-    setMsgs(m => [...m, msg])
+    if (id !== req.current) return
+    const msg: Msg = { role: 'assistant', content: reply, at: now(), cite, fig, sources } // capture before the reset below
+    setMsgs(m => [...m, msg]); setSaid(`${tc('replied', lang)} ${msg.at}`)
     cite = undefined; fig = undefined
     setBusy(false)
   }
@@ -171,57 +237,24 @@ export default function Coach() {
   const tip = tc(`tip${Math.floor(Date.now() / 864e5) % 3}`, lang)
   const tool = 'grid h-10 w-10 place-items-center rounded text-soft hover:bg-haze hover:text-ink focus-visible:bg-haze aria-pressed:text-forest'
   const Toggle = ({ on, set, label }: { on: boolean; set: (v: boolean) => void; label: string }) => (
-    <button type="button" role="switch" aria-checked={on} onClick={() => set(!on)} className="flex min-h-[40px] items-center gap-2 rounded px-1 text-[13px] text-ink hover:bg-haze">
+    <button type="button" role="switch" aria-checked={on} onClick={() => set(!on)} className="flex min-h-[44px] w-full items-center gap-2 rounded px-1 text-left text-[14px] text-ink hover:bg-haze">
       <span className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${on ? 'bg-forest' : 'bg-mist'}`}><span className={`absolute top-0.5 h-4 w-4 rounded-full bg-card shadow transition-transform ${on ? 'translate-x-[18px]' : 'translate-x-0.5'}`} /></span>{label}
     </button>
   )
-  return (
-    <div className="mx-auto grid w-full max-w-[1240px] gap-5 px-5 sm:px-8 lg:h-[calc(100dvh-150px)] lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)]">
-      {/* the coach, topics and starters */}
-      <m.aside initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={spring} className="band overflow-y-auto p-6 lg:h-full">
-        <div className="relative z-10">
-          <div className="flex items-center gap-4">
-            <span className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-white/10"><Sidekick id="dadi" size={64} /></span>
-            <div><h1 className="text-[clamp(1.5rem,2.6vw,2rem)] leading-[1.1]">{tc('coachName', lang)}</h1>
-              <p className="label mt-1 flex items-center gap-1.5"><span className={`h-1.5 w-1.5 rounded-full ${online ? 'bg-[#9AD08F]' : 'bg-[#FFFFFF]'}`} />{tc('calcBacked', lang)}</p></div>
-          </div>
-          <div className="mt-5 [&_*]:!text-[13px]"><Segmented label={tc('tp_money', lang)} value={topic} onChange={setTopic} options={TOPICS.map(x => ({ id: x, name: tc(`tp_${x}`, lang) }))} /></div>
-          <ul className="mt-3 grid gap-2">
-            {[1, 2].map((n, i) => { const q = tc(`st_${topic}${n}`, lang); return (
-              <m.li key={topic + n} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring, delay: i * 0.06 }}>
-                <button onClick={() => send(q)} disabled={busy} className="tile pressable flex min-h-[52px] w-full items-center gap-3 px-4 text-left text-[15px] hover:border-[#FFFFFF]/60 focus-visible:border-[#FFFFFF] disabled:opacity-60">{q}</button>
-              </m.li>) })}
-          </ul>
-          <div className="mt-5 rounded-xl border border-white/15 bg-white/5 p-4"><p className="label !text-[#FFFFFF]">{tc('tip', lang)}</p><p className="mt-1 text-[15px] leading-relaxed">{tip}</p></div>
-          {!hasData && <Link to="/tracker" className="mt-4 block rounded-lg border border-[#FFFFFF]/50 px-4 py-3 text-[14px] text-[#FFFFFF] hover:bg-white/5">{t('coach.noData')}</Link>}
-          {offline && <p className="mt-5 border-l-2 border-[#FFFFFF] pl-3 text-[13px] leading-relaxed text-[#FFFFFF]/70">{t('coach.offline')}</p>}
-        </div>
-      </m.aside>
-
-      {/* the conversation */}
-      <m.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.06 }} className="hud relative flex min-h-[75dvh] flex-col overflow-hidden lg:h-full lg:min-h-0">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-card/95 px-5 py-3">
-          <p className="font-serif text-[1.2rem] text-ink">{t('nav.coach')}</p>
-          <button className="row !min-h-[40px] !w-auto shrink-0 gap-1.5 !px-3 text-[14px]" onClick={() => { setMsgs([]); setAbout(undefined); window.speechSynthesis?.cancel() }}><Plus size={15} />{tc('newChat', lang)}</button>
-        </header>
-        <div className="relative flex-1 space-y-5 overflow-y-auto p-5 sm:p-7" role="log" aria-live="polite" aria-label={t('nav.coach')}>
-          <WorldStill vitality={0.9} level={3} className="pointer-events-none absolute bottom-4 right-4 h-[140px] w-[190px] opacity-[0.08]" />
-          {!online && <p className="rounded-md border border-amber/50 bg-haze px-3 py-2 text-[14px] text-ink">{tc('offline', lang)}</p>}
-          <div className="flex gap-3">
-            <span aria-hidden className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-forest"><span className="h-3 w-3 rounded-full bg-amber-soft" /></span>
-            <div className="max-w-[88%]"><div className="rounded-xl rounded-tl-sm border border-line bg-haze px-5 py-4"><Stream text={tc('hello', lang)} /></div>
-              {msgs.length === 0 && <><p className="label mt-3">{tc('tryAsk', lang)}</p><div className="mt-1.5 flex flex-wrap gap-2">{TOPICS.map(x => tc(`st_${x}1`, lang)).map(q => <button key={q} onClick={() => send(q)} className="min-h-[40px] rounded-full border border-line bg-card px-3 text-[14px] text-ink hover:-translate-y-0.5 hover:border-forest focus-visible:border-forest active:scale-[0.97]">{q}</button>)}</div></>}</div>
-          </div>
-          {msgs.map((msg, i) => (
-            <m.div key={i} initial={{ opacity: 0, x: msg.role === 'user' ? 24 : -24, scale: 0.97 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={spring}
+  const AV = <span aria-hidden className="mt-1 grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-card"><Sidekick id="dadi" size={34} moving={busy} /></span>
+  // each exchange is one turn: the question, then everything the coach said back
+  const turns: number[][] = []
+  msgs.forEach((x, i) => { if (x.role === 'user' || !turns.length) turns.push([i]); else turns[turns.length - 1].push(i) })
+  const bubble = (msg: Msg, i: number) => (
+            <m.div key={i} initial={{ opacity: 0, y: msg.role === 'user' ? 8 : 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              {msg.role === 'assistant' && <span aria-hidden className="mt-6 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-forest"><span className="h-3 w-3 rounded-full bg-amber-soft" /></span>}
-              <div className={msg.role === 'user' ? 'max-w-[80%]' : 'min-w-0 max-w-[88%]'}>
+              {msg.role === 'assistant' && AV}
+              <div className={msg.role === 'user' ? 'max-w-[min(80%,72ch)]' : 'min-w-0 max-w-[min(92%,72ch)]'}>
                 <Label className={msg.role === 'user' ? 'block text-right' : ''}>{msg.at} · {t(msg.role === 'user' ? 'coach.you' : 'coach.coach')}</Label>
                 {msg.role === 'user'
-                  ? <p className="mt-1 whitespace-pre-wrap rounded-xl rounded-tr-sm bg-forest px-4 py-3 leading-relaxed text-on-forest shadow-paper">{msg.content}</p>
+                  ? <p data-q className="mt-1 whitespace-pre-wrap rounded-2xl rounded-tr-sm border border-ink/20 bg-ink/[0.12] px-4 py-3 text-[16.5px] leading-[1.6] text-ink">{msg.content}</p>
                   : msg.err ? <div className="mt-1 flex flex-wrap items-center gap-3 rounded-xl border border-rust/50 bg-card px-4 py-3"><span className="text-ink">{msg.content}</span><button className="row !min-h-[40px] gap-1.5 !px-3" onClick={retry}><RotateCcw size={14} />{tc('retry', lang)}</button></div>
-                  : <div className="mt-1 rounded-xl rounded-tl-sm border border-line bg-haze px-5 py-4"><Stream text={msg.content} /></div>}
+                  : <div className="mt-1 rounded-2xl rounded-tl-sm border border-line bg-card px-5 py-4"><Stream text={msg.content} instant={i !== msgs.length - 1} /></div>}
                 {speaking === i && <span aria-hidden className="mt-2 block h-0.5 origin-left bg-forest transition-transform duration-200" style={{ transform: `scaleX(${readPct})` }} />}
                 {msg.fig && (
                   <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.4 }} className="mt-3 rounded-lg border border-amber/50 bg-card p-4">
@@ -246,7 +279,6 @@ export default function Coach() {
                       <button className={tool} aria-pressed={fb[msg.at + i] === 1} aria-label={tc('up', lang)} onClick={() => vote(msg.at + i, 1)}>👍</button>
                       <button className={tool} aria-pressed={fb[msg.at + i] === -1} aria-label={tc('down', lang)} onClick={() => vote(msg.at + i, -1)}>👎</button>
                     </div>
-                    {msg.follow && msg.follow.length > 0 && i === msgs.length - 1 && <><p className="label mt-2">{tc('askNext', lang)}</p><div className="mt-1 flex flex-wrap gap-2">{msg.follow.map(q => <button key={q} onClick={() => send(q)} disabled={busy} className="min-h-[40px] rounded-full border border-line bg-card px-3 text-[14px] text-ink hover:-translate-y-0.5 hover:border-forest focus-visible:border-forest active:scale-[0.97] disabled:opacity-60">{q}</button>)}</div></>}
                     <div className="mt-2 flex flex-wrap gap-2">
                       <button className="row !min-h-[40px] !px-3 text-[14px]" onClick={() => nav('/tracker', { state: { extra: msg.fig?.monthly ?? 0 } })}>{tc('trySim', lang)}</button>
                       {msg.fig && <button className="row !min-h-[40px] !px-3 text-[14px]" onClick={() => nav('/tracker', { state: { plan: msg.fig!.monthly } })}>{tc('addPlan', lang)}</button>}
@@ -256,37 +288,116 @@ export default function Coach() {
                 )}
               </div>
             </m.div>
-          ))}
-          <AnimatePresence>
-            {busy && (
-              <m.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-3" aria-label={t('coach.thinking')}>
-                <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-forest"><span className="h-3 w-3 rounded-full bg-amber-soft" /></span>
-                <span className="flex items-center gap-1.5 rounded-xl border border-line bg-haze px-4 py-3">{[0, 1, 2].map(d => <span key={d} className="dot h-2 w-2 rounded-full bg-soft" style={{ animationDelay: `${d * 0.15}s` }} />)}</span>
-              </m.div>
-            )}
-          </AnimatePresence>
-          <div ref={end} />
-        </div>
-
-        <form onSubmit={(e: FormEvent) => { e.preventDefault(); send(input) }} className="border-t border-line bg-paper/60 p-3 sm:p-4">
-          <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-            <span className="flex items-center"><Toggle on={Boolean(user?.ai_consent)} set={v => { api.update({ ai_consent: v }).then(() => refresh()).catch(() => {}) }} label={tc('extAI', lang)} />
-              <button type="button" className="tip-host relative grid h-9 w-9 place-items-center rounded text-soft hover:text-ink" aria-label={`${tc('info', lang)}: ${tc('extAI', lang)}`}><Info size={14} />
-                <span role="tooltip" className="tip pointer-events-none absolute bottom-full left-0 z-20 mb-1 w-[min(320px,80vw)] rounded-md bg-ink p-3 text-left text-[13px] leading-relaxed text-paper opacity-0 shadow-lg transition-opacity"><b className="block">{t('coach.shareAI')}</b>{t('coach.shareNote')}</span></button></span>
-            <span className="flex items-center"><Toggle on={useCtx} set={v => { setUseCtx(v); try { localStorage.setItem('pq.coach.ctx', v ? '1' : '0') } catch { /* storage off */ } }} label={tc('useTr', lang)} />
-              <button type="button" className="tip-host relative grid h-9 w-9 place-items-center rounded text-soft hover:text-ink" aria-label={`${tc('info', lang)}: ${tc('useTr', lang)}`}><Info size={14} />
-                <span role="tooltip" className="tip pointer-events-none absolute bottom-full left-0 z-20 mb-1 w-[min(280px,80vw)] rounded-md bg-ink p-3 text-left text-[13px] leading-relaxed text-paper opacity-0 shadow-lg transition-opacity">{tc('trNote', lang)}</span></button></span>
+  )
+  return (
+    <div className="coach-shell mx-auto grid w-full max-w-[1240px] gap-5 px-3 sm:px-8 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
+      {/* the coach, topics and starters */}
+      {topics && <button type="button" aria-label={tc('close', lang)} className="fixed inset-0 z-[55] bg-black/60 lg:hidden" onClick={() => setTopics(false)} />}
+      <m.aside initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={spring} className={`band min-h-0 overflow-y-auto p-5 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-[56] max-lg:max-h-[80dvh] max-lg:!rounded-b-none lg:h-full ${topics ? '' : 'max-lg:hidden'}`}>
+        <div className="relative z-10">
+          <div className="flex items-center gap-4">
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-ink/10"><Sidekick id="dadi" size={46} /></span>
+            <div><h1 className="text-[1.35rem] leading-[1.15]">{tc('coachName', lang)}</h1>
+              <p className="label mt-1 flex items-center gap-1.5"><span className={`h-1.5 w-1.5 rounded-full ${online ? 'bg-[#9AD08F]' : 'bg-ink'}`} />{tc('calcBacked', lang)}</p></div>
           </div>
-          {(useCtx && user || about) && <div className="mb-2 flex flex-wrap gap-1.5" aria-label={tc('useTr', lang)}>
+          <div className="mt-5 [&_*]:!text-[13px]"><Segmented label={tc('tp_money', lang)} value={topic} onChange={setTopic} options={TOPICS.map(x => ({ id: x, name: tc(`tp_${x}`, lang) }))} /></div>
+          <ul className="mt-3 grid gap-2" data-guide="coach-starters">
+            {[1, 2].map((n, i) => { const q = tc(`st_${topic}${n}`, lang); return (
+              <m.li key={topic + n} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring, delay: i * 0.06 }}>
+                <button onClick={() => send(q)} disabled={busy} className="tile pressable flex min-h-[52px] w-full items-center gap-3 px-4 text-left text-[15px] hover:border-ink/60 focus-visible:border-ink disabled:opacity-60">{q}</button>
+              </m.li>) })}
+            {market.real && market.data && [getMoney().assets.some(isLinked) ? 'mk.askMine' : null, 'mk.askMarket'].filter(Boolean).map(k => { const q = t(k!, { date: dateLabel(market.data!) }); return (
+              <li key={k}><button onClick={() => send(q)} disabled={busy} className="tile pressable flex min-h-[52px] w-full items-center gap-3 px-4 text-left text-[15px] hover:border-[#FFFFFF]/60 focus-visible:border-[#FFFFFF] disabled:opacity-60">{q}</button></li>) })}
+          </ul>
+          <div className="mt-4 rounded-xl border border-ink/15 bg-ink/5 p-3"><p className="label !text-ink">{tc('tip', lang)}</p><p className="mt-1 text-[13.5px] leading-snug">{tip}</p></div>
+          {!hasData && <Link to="/tracker" className="mt-4 block rounded-lg border border-ink/50 px-4 py-3 text-[14px] text-ink hover:bg-ink/5">{t('coach.noData')}</Link>}
+          {offline && <p className="mt-5 border-l-2 border-ink pl-3 text-[13px] leading-relaxed text-ink/70">{t('coach.offline')}</p>}
+        </div>
+      </m.aside>
+
+      {/* the conversation */}
+      <m.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.06 }} className="hud relative flex h-full min-h-0 flex-col overflow-hidden"
+        onPointerMove={e => { if (e.pointerType === 'mouse' && !calm) { const r = e.currentTarget.getBoundingClientRect(); e.currentTarget.style.setProperty('--rb-x', ((e.clientX - r.left) / r.width - 0.5).toFixed(3)) } }}>
+        <header className="relative z-10 flex shrink-0 items-center gap-2 border-b border-line bg-card px-4 py-2.5 sm:px-5">
+          <p className="flex-1 truncate font-serif text-[1.2rem] text-ink">{t('nav.coach')}</p>
+          <button type="button" className="row !min-h-[44px] !w-auto shrink-0 !px-3 text-[14px] lg:hidden" aria-expanded={topics} onClick={() => setTopics(o => !o)}>{tc('topics', lang)}</button>
+          <CoachDisclaimer />
+          <button className="row !min-h-[44px] !w-auto shrink-0 gap-1.5 !px-3 text-[14px] sm:!min-h-[40px]" aria-label={tc('newChat', lang)} onClick={() => { stop(); setMsgs([]); setAbout(undefined); setLastQ(''); window.speechSynthesis?.cancel(); ta.current?.focus() }}><Plus size={15} /><span className="max-sm:hidden">{tc('newChat', lang)}</span></button>
+          {busy && <span aria-hidden className="coach-line" />}
+        </header>
+        <div className="relative flex min-h-0 flex-1 flex-col">
+          <RoadBackdrop steps={msgs.filter(x => x.role === 'assistant' && !x.err).length} dim={msgs.length > 0} />
+          {stuck && lastQ && (
+            <div className="absolute inset-x-0 top-0 z-10 flex items-center gap-2 border-b border-line bg-card px-4 py-1.5">
+              <p className="min-w-0 flex-1 truncate text-[14px] text-soft">{lastQ}</p>
+              <button type="button" aria-label={tc('backToQ', lang)} title={tc('backToQ', lang)} onClick={() => { manual.current = false; pinQuestion() }} className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-ink/20 text-ink hover:border-ink/50"><ArrowUp size={16} aria-hidden /></button>
+            </div>
+          )}
+          <div ref={list} tabIndex={0} className="coach-list space-y-5 p-4 sm:p-6" role="log" aria-live="off" aria-label={t('nav.coach')}>
+            {!online && <p className="relative z-[1] rounded-md border border-amber/50 bg-card px-3 py-2 text-[14px] text-ink">{tc('offline', lang)}</p>}
+            {msgs.length === 0 && (
+              <div className="relative z-[1] flex gap-3">
+                {AV}
+                <div className="max-w-[min(92%,72ch)]"><div className="rounded-2xl rounded-tl-sm border border-line bg-card px-5 py-4"><Stream text={tc('hello', lang)} /></div>
+                  <p className="label mt-3">{tc('tryAsk', lang)}</p>
+                  {/* three picks from the other topics, so they never repeat the list on the left */}
+                  <div className="mt-1.5 flex flex-wrap gap-2">{TOPICS.filter(x => x !== topic).map(x => tc(`st_${x}1`, lang)).map(q => <button key={q} onClick={() => send(q)} className="min-h-[44px] rounded-full border border-line bg-card px-3.5 text-left text-[14.5px] text-ink hover:-translate-y-0.5 hover:border-forest focus-visible:border-forest active:scale-[0.97]">{q}</button>)}</div></div>
+              </div>
+            )}
+            {turns.map((idx, ti) => { const last = ti === turns.length - 1; return (
+              <section key={ti} className="turn" ref={last ? lastTurn : undefined} style={last ? { minHeight: Math.max(listH - 28, 0) } : undefined}>
+                <div ref={last ? body : undefined} className="space-y-5 pb-2">
+                  {idx.map(i => bubble(msgs[i], i))}
+                  {last && busy && (
+                    <div className="flex items-center gap-3" role="status" aria-label={t('coach.thinking')}>
+                      {AV}
+                      <span className="flex items-center gap-1.5 rounded-2xl border border-line bg-card px-4 py-3">{[0, 1, 2].map(d => <span key={d} className="dot h-2 w-2 rounded-full bg-soft" style={{ animationDelay: `${d * 0.15}s` }} />)}</span>
+                    </div>
+                  )}
+                </div>
+              </section>
+            ) })}
+          </div>
+          {jump && (
+            <button type="button" onClick={() => { const l = list.current, bd = body.current; if (l && bd) l.scrollTo({ top: l.scrollTop + bd.getBoundingClientRect().bottom - l.getBoundingClientRect().bottom + 16, behavior: calm ? 'auto' : 'smooth' }) }}
+              className="absolute bottom-3 left-1/2 z-10 inline-flex min-h-[44px] -translate-x-1/2 items-center gap-2 rounded-full border border-ink/25 bg-card px-4 text-[14px] text-ink shadow-lg hover:border-ink/60">
+              <span aria-hidden className="h-2 w-2 rounded-full bg-up" /><ArrowDown size={15} aria-hidden />{tc('jump', lang)}
+            </button>
+          )}
+        </div>
+        <p className="sr-only" role="status" aria-live="polite">{said}</p>
+
+        <form onSubmit={(e: FormEvent) => { e.preventDefault(); send(input) }} className="relative z-10 shrink-0 border-t border-line bg-card p-3 sm:p-4" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+          <div className="mb-2 flex flex-wrap items-center gap-1.5">
+            {/* one pill for both privacy switches; both are off unless the person turns them on */}
+            <span className="relative">
+              <button type="button" data-guide="coach-consent" aria-expanded={priv} aria-haspopup="dialog" onClick={() => setPriv(o => !o)}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-ink/20 px-3 text-[13px] text-ink hover:border-ink/50 sm:min-h-[36px]">
+                <Lock size={13} strokeWidth={1.6} aria-hidden />
+                <span>{tc('pillAI', lang)}: <b className="font-medium">{tc(user?.ai_consent ? 'on' : 'off', lang)}</b> · {tc('pillTr', lang)}: <b className="font-medium">{tc(useCtx ? 'on' : 'off', lang)}</b></span>
+              </button>
+              {priv && (
+                <div role="dialog" aria-label={tc('privTitle', lang)} className="surface-float absolute bottom-full left-0 z-30 mb-2 w-[min(360px,calc(100vw-40px))] p-4">
+                  <div className="flex items-center justify-between gap-2"><p className="label">{tc('privTitle', lang)}</p>
+                    <button type="button" aria-label={tc('close', lang)} onClick={() => setPriv(false)} className="grid h-11 w-11 place-items-center rounded-full text-soft hover:text-ink"><X size={16} aria-hidden /></button></div>
+                  <Toggle on={Boolean(user?.ai_consent)} set={v => { api.update({ ai_consent: v }).then(() => refresh()).catch(() => {}) }} label={tc('extAI', lang)} />
+                  <p className="mb-3 mt-1 text-[13px] leading-relaxed text-soft"><b className="block font-medium text-ink">{t('coach.shareAI')}</b>{t('coach.shareNote')}</p>
+                  <Toggle on={useCtx} set={v => { setUseCtx(v); try { localStorage.setItem('pq.coach.ctx', v ? '1' : '0') } catch { /* storage off */ } }} label={tc('useTr', lang)} />
+                  <p className="mt-1 text-[13px] leading-relaxed text-soft">{tc('trNote', lang)}</p>
+                </div>
+              )}
+            </span>
             {useCtx && user && [tc('cAge', lang, { n: user.age }), tc('cScore', lang, { n: rd.score })].map(c => <span key={c} className="label rounded-full border border-forest/40 bg-haze px-2.5 py-1 !text-forest">{c}</span>)}
             {about && <button type="button" onClick={() => setAbout(undefined)} className="label rounded-full border border-amber/60 bg-card px-2.5 py-1 !text-ink hover:border-rust">{tc('cAbout', lang, { x: t(`tr.p.${about}`) })} ×</button>}
-          </div>}
-          {lastQ && <div className="mb-2 flex flex-wrap gap-1.5">{(['qSimple', 'qMath', 'qHindi'] as const).map(k => <button type="button" key={k} disabled={busy} onClick={() => send(`${tc(k, lang)}: ${lastQ}`)} className="min-h-[36px] rounded-full border border-line bg-card px-3 text-[13px] text-ink hover:border-forest focus-visible:border-forest active:scale-[0.97] disabled:opacity-60">{tc(k, lang)}</button>)}</div>}
-          <div className="flex gap-2">
+            {/* follow-up styles for the last answer, once there is one */}
+            {lastQ && !busy && msgs.some(x => x.role === 'assistant' && !x.err) && (['qSimple', 'qMath', 'qHindi'] as const).map(k => <button type="button" key={k} onClick={() => send(`${tc(k, lang)}: ${lastQ}`)} className="min-h-[44px] rounded-full border border-line bg-card px-3 text-[13px] text-ink hover:border-forest focus-visible:border-forest active:scale-[0.97] sm:min-h-[36px]">{tc(k, lang)}</button>)}
+          </div>
+          <div className="flex items-end gap-2">
             <label htmlFor="ask" className="sr-only">{t('coach.place')}</label>
-            <input id="ask" className="field min-w-0 flex-1 focus-visible:shadow-[0_0_0_4px_rgb(var(--forest)/0.15)]" value={input} onChange={e => setInput(e.target.value)} placeholder={t('coach.place')} maxLength={1000} autoComplete="off" />
+            <textarea id="ask" ref={ta} rows={1} data-guide="coach-input" className="field coach-ta min-w-0 flex-1 py-3" value={input} onChange={e => setInput(e.target.value)} placeholder={t('coach.place')} maxLength={1000} autoComplete="off"
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(input) } }} />
             {SR && (
-              <button type="button" onClick={listen} aria-label={listening ? t('coach.stop') : t('coach.listen')} aria-pressed={listening}
+              <button type="button" data-guide="coach-mic" onClick={listen} aria-label={listening ? t('coach.stop') : t('coach.listen')} aria-pressed={listening}
                 className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-md border bg-card ${listening ? 'border-amber text-rust' : 'border-line text-ink hover:border-forest'}`}>
                 {listening && <span aria-hidden className="listen-ring absolute inset-0 rounded-md border-2 border-amber" />}
                 {listening
@@ -294,9 +405,11 @@ export default function Coach() {
                   : <Mic size={18} strokeWidth={1.5} aria-hidden />}
               </button>
             )}
-            <m.button className="btn" disabled={!input.trim() || busy} animate={{ scale: input.trim() ? [1, 1.08, 1] : 0.96 }} transition={spring}>{t('coach.send')}</m.button>
+            {busy
+              ? <button type="button" className="btn-quiet !min-h-[48px] gap-2" onClick={stop}><Square size={14} aria-hidden />{tc('stop', lang)}</button>
+              : <m.button className="btn !min-h-[48px]" disabled={!input.trim()} animate={{ scale: input.trim() ? [1, 1.08, 1] : 0.96 }} transition={spring}>{t('coach.send')}</m.button>}
           </div>
-          <p className="label mt-2">{tc('note', lang)}</p>
+          <p className="label mt-2 flex justify-between gap-3"><span className="truncate">{tc('note', lang)}</span>{input.length > 800 && <span className="num shrink-0" aria-live="polite">{input.length} / 1000</span>}</p>
         </form>
       </m.section>
     </div>
@@ -304,13 +417,15 @@ export default function Coach() {
 }
 
 /** The coach's reply arrives word by word (all at once under reduced motion). */
-function Stream({ text }: { text: string }) {
+function Stream({ text, instant = false }: { text: string; instant?: boolean }) {
   const words = text.split(' ')
   const [n, setN] = useState(() => (prefersLessMotion() ? words.length : 0))
+  // an older answer finishes at once when a new question is sent, so nothing above the new question keeps growing
+  useEffect(() => { if (instant) setN(words.length) }, [instant, words.length])
   useEffect(() => {
     if (n >= words.length) return
     const id = setTimeout(() => setN(c => c + 1), 28)
     return () => clearTimeout(id)
   }, [n, words.length])
-  return <p className="whitespace-pre-wrap font-serif text-[19px] leading-relaxed text-ink">{words.slice(0, n).join(' ')}<span className="sr-only">{words.slice(n).join(' ')}</span></p>
+  return <p className="whitespace-pre-wrap text-[16.5px] leading-[1.6] text-ink">{words.slice(0, n).join(' ')}<span className="sr-only">{words.slice(n).join(' ')}</span></p>
 }

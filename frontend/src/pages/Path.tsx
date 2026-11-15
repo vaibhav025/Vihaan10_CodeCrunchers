@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { m } from 'framer-motion'
-import { DailyQuests, League, StreakNotes } from '../components/meta/MetaPanels'
+import { DailyQuests, StreakNotes } from '../components/meta/MetaPanels'
 import ToolsStrip from '../components/meta/ToolsStrip'
 import { MonthCard, NextStep, TipCard, rise, useLabRows } from '../components/dash/panels'
 import MarketPulse from '../components/dash/MarketPulse'
@@ -19,19 +19,18 @@ export default function Path() {
     <div className="mx-auto w-full max-w-[1320px] space-y-5 px-5 sm:px-8">
       <StreakNotes gap={gap} />
       <NextStep rows={rows} />
-      <ProgressBoard rows={rows} i={1} />
+      <div data-guide="progress"><ProgressBoard rows={rows} i={1} /></div>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-5">
-          <MarketPulse i={2} />
-          <VaultBoard i={3} />
-          <LabBoard rows={rows} failed={failed} i={4} />
-          <m.div {...rise(5)}><ToolsStrip tools /></m.div>
+          <div data-guide="market"><MarketPulse i={2} /></div>
+          <div data-guide="vault"><VaultBoard i={3} /></div>
+          <div data-guide="lab-scores"><LabBoard rows={rows} failed={failed} i={4} /></div>
+          <m.div {...rise(5)} data-guide="tools"><ToolsStrip tools /></m.div>
         </div>
         <aside className="space-y-5">
-          <m.div {...rise(2)}><DailyQuests /></m.div>
+          <m.div {...rise(2)} data-guide="quests"><DailyQuests /></m.div>
           <MonthCard i={3} />
           <TipCard i={4} />
-          {(user.total_xp ?? 0) > 0 && <m.div {...rise(5)}><League compact /></m.div>}
         </aside>
       </div>
     </div>

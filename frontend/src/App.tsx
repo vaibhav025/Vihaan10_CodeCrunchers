@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode } from 'react'
+import { lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Compass as Home, FlaskConical, Menu, X, Lock, LogOut, MessageSquare, Moon, ScrollText, SlidersHorizontal, Sun, UserRound } from './components/ui/icons'
 import { I18nProvider, LANGS, useI18n, type Lang } from './lib/i18n'
@@ -12,12 +12,14 @@ import { page as pageMotion } from './ui/motion'
 import { useReduceMotion } from './lib/motionPref'
 import { Disclaimer, Label } from './components/ui/kit'
 import { Boot, Celebration, HudBar } from './components/ui/game'
-import Tour from './components/ui/Tour'
+import Launcher from './guide/Launcher'
+import { GuideProvider } from './guide/GuideProvider'
 import { GameEventsProvider } from './lib/events'
 import Landing from './pages/Landing'
 import Cursor from './ui/Cursor'
 
-import { Coach, EmployerCheck, Habits, ScamShield, Explore, Lesson, Play, Wardrobe, MotionDebug, Story, Onboarding, Login, PathPage, Privacy, Profile, Quest, Tracker, Lab, LabStocks, LabRetire, LabFunds, LabSchemes } from './routes'
+import { Coach, EmployerCheck, Habits, ScamShield, Explore, Lesson, Play, Wardrobe, MotionDebug, Story, Onboarding, Login, PathPage, Privacy, Profile, Quest, Tracker, Lab, LabStocks, LabReplay, LabRetire, LabFunds, LabSchemes } from './routes'
+import { useRepriceHoldings } from './lib/marketDay'
 
 const TABS = [
   { to: '/home', key: 'nav.path', icon: Home },
@@ -44,7 +46,7 @@ export function LangSelect() {
   const { lang, setLang, t } = useI18n()
   const { user } = useSession()
   return (
-    <select
+    <select data-guide="lang"
       aria-label={t('pro.lang')}
       value={lang}
       onChange={e => {
@@ -90,7 +92,7 @@ function TopTabs() {
   return (
     <nav ref={nav} aria-label="Main" className="relative hidden items-center gap-1 md:flex">
       {TABS.map(tab => (
-        <NavLink key={tab.to} to={tab.to} className={({ isActive }) => `relative z-10 flex h-11 items-center px-4 text-[15px] transition-colors hover:text-ink ${isActive ? 'text-ink' : 'text-ink/70'}`}>{t(tab.key)}</NavLink>
+        <NavLink key={tab.to} to={tab.to} data-guide={`nav-${tab.to.slice(1)}`} className={({ isActive }) => `relative z-10 flex h-11 items-center px-4 text-[15px] transition-colors hover:text-ink ${isActive ? 'text-ink' : 'text-ink/70'}`}>{t(tab.key)}</NavLink>
       ))}
       <m.span aria-hidden className="absolute left-0 top-1 h-9 rounded-full bg-ink/10" initial={false}
         animate={{ x: bar.x, width: bar.w, opacity: bar.w ? 1 : 0 }} transition={{ type: 'spring', stiffness: 260, damping: 26 }} />
@@ -120,7 +122,7 @@ function AccountMenu() {
   const item = 'flex min-h-[44px] w-full items-center gap-3 px-4 text-left text-ink hover:bg-haze'
   return (
     <div ref={box} className="relative">
-      <button type="button" onClick={() => setOpen(o => !o)} aria-haspopup="menu" aria-expanded={open} aria-label={t('nav.account')}
+      <button type="button" data-guide="account" onClick={() => setOpen(o => !o)} aria-haspopup="menu" aria-expanded={open} aria-label={t('nav.account')}
         className={`flex h-11 w-11 items-center justify-center rounded-full bg-forest font-semibold text-on-forest transition-transform active:scale-95 ${open ? 'ring-2 ring-ink/40 ring-offset-2 ring-offset-paper' : ''}`}>
         {user.name.trim().charAt(0).toUpperCase() || <UserRound size={18} strokeWidth={1.5} aria-hidden />}
       </button>
@@ -147,6 +149,7 @@ function AccountMenu() {
 
 function Shell({ children }: { children: ReactNode }) {
   const { t, ready } = useI18n()
+  useRepriceHoldings()
   const { user, loading } = useSession()
   const { pathname } = useLocation()
   const [menu, setMenu] = useState(false)
@@ -195,7 +198,6 @@ function Shell({ children }: { children: ReactNode }) {
 
       <main id="main" className="relative flex-1 pt-[88px] sm:pt-[104px]">
         {inGame && <div className="mb-5"><HudBar /></div>}
-        {inGame && <Tour />}
         <div>{children}</div>
       </main>
 
@@ -212,7 +214,7 @@ function Shell({ children }: { children: ReactNode }) {
           <ul className="grid grid-cols-5">
             {TABS.map(tab => (
               <li key={tab.to}>
-                <NavLink to={tab.to}
+                <NavLink to={tab.to} data-guide={`nav-${tab.to.slice(1)}`}
                   className={({ isActive }) => `flex h-[60px] flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? 'bg-ink/10 text-ink' : 'text-soft'}`}>
                   <tab.icon size={20} strokeWidth={1.5} aria-hidden />
                   <span className="text-[11px] font-medium tracking-wide">{t(tab.key)}</span>
@@ -251,6 +253,7 @@ function Routed() {
           <Route path="/start" element={<Onboarding />} />
           <Route path="/login" element={<Login />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/help" element={<Help />} />
           <Route path="/home" element={<Guard><PathPage /></Guard>} />
           <Route path="/lesson/:id" element={<Guard><Lesson /></Guard>} />
           <Route path="/play/:id" element={<Guard><Play /></Guard>} />
@@ -266,6 +269,7 @@ function Routed() {
           <Route path="/coach" element={<Guard><Coach /></Guard>} />
           <Route path="/lab" element={<Guard><Lab /></Guard>} />
           <Route path="/lab/stocks" element={<Guard><LabStocks /></Guard>} />
+          <Route path="/lab/replay" element={<Guard><LabReplay /></Guard>} />
           <Route path="/lab/retire" element={<Guard><LabRetire /></Guard>} />
           <Route path="/lab/funds" element={<Guard><LabFunds /></Guard>} />
           <Route path="/lab/schemes" element={<Guard><LabSchemes /></Guard>} />
@@ -277,6 +281,7 @@ function Routed() {
         </AnimatePresence>
       </Suspense>
     </Shell>
+    <Launcher />
     <Cursor />
     <Celebration />
     <Boot ready={!loading && ready} />
@@ -284,6 +289,7 @@ function Routed() {
   )
 }
 
+const Help = lazy(() => import('./pages/Help'))
 const motionFeatures = () => import('./lib/motionFeatures').then(r => r.default)
 
 export default function App() {
@@ -301,7 +307,7 @@ export default function App() {
       <I18nProvider>
         <SessionProvider>
           <GameEventsProvider>
-            <Routed />
+            <GuideProvider><Routed /></GuideProvider>
           </GameEventsProvider>
         </SessionProvider>
       </I18nProvider>

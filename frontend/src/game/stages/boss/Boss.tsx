@@ -33,7 +33,7 @@ export default function Boss({ config, lang, assist, reducedMotion: calm, onComp
       <div className="mx-auto max-w-[720px]">
         <p className="text-center font-serif text-[clamp(1.3rem,3.2vw,1.8rem)] leading-snug text-ink">{storm ? gt(`bs_${storm.k}`, lang) : n >= STORMS.length ? gt('r_boss2', lang, { m: runway, h: STORMS.length - cracked }) : gt('bs_prep2', lang, { n: p.tokens })}</p>
         <div className="relative mx-auto mt-5 h-[170px] w-[200px]">
-          {storm && <m.div key={n} className="absolute -top-2 left-1/2 -ml-[60px] w-[120px] rounded-full bg-[#55635A] py-2 text-center font-mono text-[12px] uppercase text-white" initial={{ y: -60, opacity: 0 }} animate={{ y: 30, opacity: [0, 1, 1, 0] }} transition={{ duration: calm ? 0.4 : 1.3 }}>{gt(`bs_${storm.k}_s`, lang)}</m.div>}
+          {storm && <m.div key={n} className="absolute -top-2 left-1/2 -ml-[60px] w-[120px] rounded-full bg-[#55635A] py-2 text-center font-mono text-[12px] uppercase text-ink" initial={{ y: -60, opacity: 0 }} animate={{ y: 30, opacity: [0, 1, 1, 0] }} transition={{ duration: calm ? 0.4 : 1.3 }}>{gt(`bs_${storm.k}_s`, lang)}</m.div>}
           <m.svg viewBox="0 0 200 170" className="h-full w-full" animate={storm && !calm ? (held(storm.needs) ? { scale: [1, 1.04, 1] } : { x: [0, -8, 8, -5, 0] }) : {}} transition={{ duration: 0.5, delay: calm ? 0 : 0.9 }} aria-hidden>
             <rect x="30" y="40" width="140" height="120" rx="14" fill="#55635A" /><rect x="42" y="52" width="116" height="96" rx="10" fill="#6E7D72" />
             <circle cx="100" cy="100" r="28" fill="#3E4A42" /><path d="M100 76v48M76 100h48" stroke="#C9CCC4" strokeWidth="5" strokeLinecap="round" />

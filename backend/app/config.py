@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     # the built-in engine answers instead. False: fall back to the direct providers above.
     PRUNE_STRICT: bool = True
 
+    # The downloaded NSE trading day (scripts/fetch_market_day.py). Empty: ../frontend/public/data/replay.json
+    MARKET_DATA_FILE: str = ""
+
     # Google Translate
     GOOGLE_TRANSLATE_API_KEY: str = ""
 

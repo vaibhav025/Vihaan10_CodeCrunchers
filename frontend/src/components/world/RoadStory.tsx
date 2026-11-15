@@ -50,7 +50,7 @@ export default function RoadStory({ vitality, state, age, saving, onSaving, maxS
 
   return (
     <section ref={box} aria-labelledby="road-title" className="relative mt-16" style={{ height: `${ZONES.length * 75 + 40}vh` }}>
-      <div className="sticky top-0 h-[100dvh] overflow-hidden bg-[linear-gradient(180deg,rgb(var(--haze)),rgb(var(--paper)))]">
+      <div className="theme-dark sticky top-0 h-[100dvh] overflow-hidden bg-[linear-gradient(180deg,rgb(var(--haze)),rgb(var(--paper)))]">
         {near && <LifeWorld profile={profile} userId="landing" mode="landing" scrollS={s} backdrop className="h-full w-full" label={t('road.title')} />}
         {/* soft edges so the HUD reads over the world */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-paper to-transparent" />

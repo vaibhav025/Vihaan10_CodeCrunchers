@@ -6,7 +6,9 @@ import { useSyncExternalStore } from 'react'
  */
 export type AssetType = 'fd' | 'stocks' | 'mf' | 'esop' | 'epf' | 'ppf' | 'nps' | 'gold' | 'property' | 'cash' | 'other'
 /** One holding. `name` and `rate` are the player's own; without a rate the class default is used. */
-export interface Asset { id: string; type: AssetType; value: number; monthly: number; name?: string; rate?: number; /** last edit, ms */ at?: number }
+export interface Asset { id: string; type: AssetType; value: number; monthly: number; name?: string; rate?: number; /** last edit, ms */ at?: number
+  /** a stock linked to a real NSE symbol: its value is shares × the downloaded closing price */
+  symbol?: string; qty?: number }
 export interface Cost { id: string; name: string; amt: number }
 export interface Money {
   assets: Asset[]

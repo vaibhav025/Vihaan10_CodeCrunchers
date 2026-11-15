@@ -72,7 +72,7 @@ export function LootBox({ mega, lines, lang, onDone }: { mega: boolean; lines: s
   const collect = () => { setStep(3); play('coin'); setTimeout(onDone, calm ? 0 : 900) }
   const Icon = mega ? Gift : Package
   return (
-    <div className="grid h-full place-items-center overflow-y-auto bg-[linear-gradient(135deg,#0E0E10,#000000)] px-5 py-6 text-[#FFFFFF]">
+    <div className="grid h-full place-items-center overflow-y-auto bg-paper px-5 py-6 text-ink">
       <div className="text-center" role="status">
         <p className="label !text-[#F2B544]">{gt(mega ? 'mega' : 'chest', lang)}</p>
         <div className="relative mx-auto mt-4 h-44 w-44">
@@ -88,8 +88,8 @@ export function LootBox({ mega, lines, lang, onDone }: { mega: boolean; lines: s
         <ul className="mt-3 space-y-2">
           {lines.map((l, k) => <m.li key={l} initial={false} animate={step === 3 ? { opacity: 0, y: -50 } : { opacity: step >= 2 ? 1 : 0.55, y: 0, scale: step === 2 ? [0.9, 1.06, 1] : 1 }} transition={{ ...spring, delay: step >= 2 ? k * 0.15 : 0 }} className="tile mx-auto w-fit px-5 py-2.5 text-[17px]">{l}</m.li>)}
         </ul>
-        {step === 0 && <button autoFocus className="btn game-btn mt-6 min-w-[200px] !bg-[#FFFFFF] !text-[#0A0A0A]" onClick={open}>{gt('open', lang)}</button>}
-        {step === 2 && <button autoFocus className="btn game-btn mt-6 min-w-[200px] !bg-[#FFFFFF] !text-[#0A0A0A]" onClick={collect}>{gt('collect', lang)}</button>}
+        {step === 0 && <button autoFocus className="btn game-btn mt-6 min-w-[200px] !bg-ink !text-[#0A0A0A]" onClick={open}>{gt('open', lang)}</button>}
+        {step === 2 && <button autoFocus className="btn game-btn mt-6 min-w-[200px] !bg-ink !text-[#0A0A0A]" onClick={collect}>{gt('collect', lang)}</button>}
       </div>
     </div>
   )
@@ -100,19 +100,19 @@ export function WorldDone({ world, lang, onDone }: { world: number; lang: Lang; 
   const next = COMING.find(c => c.id === world + 1)
   useEffect(() => { play('level'); buzz([30, 50, 30, 50, 80]) }, [])
   return (
-    <div className="grid h-full place-items-center bg-[linear-gradient(160deg,#0E0E10,#000000)] px-5 text-center text-[#FFFFFF]">
+    <div className="grid h-full place-items-center bg-[linear-gradient(160deg,#0E0E10,#000000)] px-5 text-center text-ink">
       <div role="status">
         <m.div className="flex justify-center gap-2" initial="a" animate="b">{[0, 1, 2, 3, 4].map(k => <m.span key={k} variants={{ a: { scale: 0, y: 20 }, b: { scale: 1, y: 0 } }} transition={{ ...spring, delay: k * 0.12 }}><Star size={k === 2 ? 46 : 30} className="fill-[#F2B544] text-[#F2B544]" /></m.span>)}</m.div>
         <m.h2 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-5 font-serif text-[clamp(2rem,6vw,3.2rem)] leading-tight">{gt('w_done', lang, { n: world })}</m.h2>
         {next && (
-          <m.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.1, ...spring }} className="mx-auto mt-7 w-[min(320px,100%)] rounded-2xl border border-white/15 bg-white/5 p-5">
-            <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-white/10 blur-[0.5px]"><Lock size={30} className="text-white/70" /></div>
+          <m.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.1, ...spring }} className="mx-auto mt-7 w-[min(320px,100%)] rounded-2xl border border-ink/15 bg-ink/5 p-5">
+            <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-ink/10 blur-[0.5px]"><Lock size={30} className="text-white/70" /></div>
             <p className="label mt-3 !text-[#F2B544]">{gt('w_next', lang, { n: next.id })}</p>
             <p className="mt-1 font-serif text-2xl text-white/80">{next.name[lang]}</p>
             <p className="label mt-1 !text-white/60">{gt('soon', lang)}</p>
           </m.div>
         )}
-        <m.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }} autoFocus className="btn game-btn mt-7 min-w-[200px] !bg-[#FFFFFF] !text-[#0A0A0A]" onClick={onDone}>{gt('cont', lang)}</m.button>
+        <m.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }} autoFocus className="btn game-btn mt-7 min-w-[200px] !bg-ink !text-[#0A0A0A]" onClick={onDone}>{gt('cont', lang)}</m.button>
       </div>
     </div>
   )

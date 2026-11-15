@@ -29,10 +29,10 @@ export default function Wardrobe() {
           <div className="relative z-10">
             <h1 className="text-[1.9rem] leading-tight">{rt('title', lang)}</h1>
             <div key={pop} className="scale-in mt-4 flex items-end justify-center"><Sidekick id={look.sidekick} size={84} moving={state === 'walk' || state === 'run'} /><Character state={state} look={look} size={168} /></div>
-            <p className="mx-auto mt-3 min-h-[3em] max-w-[260px] text-[15px] italic text-[#FFFFFF]/85">“{tx(LINES[look.sidekick][pop % 3], lang)}”</p>
+            <p className="mx-auto mt-3 min-h-[3em] max-w-[260px] text-[15px] italic text-ink/85">“{tx(LINES[look.sidekick][pop % 3], lang)}”</p>
             <Label className="mt-3 block">{rt('tryStates', lang)}</Label>
             <div className="mt-2 flex flex-wrap justify-center gap-1.5">
-              {STATES.map(s => <button key={s} aria-pressed={state === s} onClick={() => setState(s)} className={`min-h-[36px] rounded-md border px-2.5 font-mono text-[11px] uppercase tracking-wider ${state === s ? 'border-[#FFFFFF] bg-[#FFFFFF] text-[#0A0A0A]' : 'border-white/20 hover:border-white/50'}`}>{s}</button>)}
+              {STATES.map(s => <button key={s} aria-pressed={state === s} onClick={() => setState(s)} className={`min-h-[36px] rounded-md border px-2.5 font-mono text-[11px] uppercase tracking-wider ${state === s ? 'border-ink bg-ink text-[#0A0A0A]' : 'border-ink/20 hover:border-ink/50'}`}>{s}</button>)}
             </div>
             <p className="label mt-4">{rt('note', lang)}</p>
             <Link to="/home" className="mt-3 inline-block text-[15px] underline underline-offset-4">{rt('back', lang)}</Link>

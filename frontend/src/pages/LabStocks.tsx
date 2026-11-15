@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FastForward, Newspaper, Pause, Play, RotateCcw } from '../components/ui/icons'
 import { Label } from '../components/ui/kit'
+import { Terms } from '../components/ui/Term'
 import { HowTo, LabHead, LabNote, LineChart, Move, Stat, useLabSave, Tick } from '../components/lab/kit'
 import { ConcentrationLesson, NewsRound, PanicTest, VolatilityLesson, WhyPanel, worth } from '../components/lab/stocks'
 import { useI18n } from '../lib/i18n'
@@ -99,9 +100,10 @@ export default function LabStocks() {
       <LabHead title={t('lab.s.title')} sub={t('lab.s.sub')} />
       <LabNote />
       <HowTo id="stocks" />
+      <Terms keys={['trend', 'noise', 'vol', 'equity']} />
 
       {/* the virtual account and the clock */}
-      <section aria-label={t('lab.s.account')} className="hud p-5 sm:p-6">
+      <section aria-label={t('lab.s.account')} data-guide="st-account" className="hud p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
           <div>
             <Label className="!text-rust">{t('lab.s.virtual')}</Label>
@@ -113,11 +115,11 @@ export default function LabStocks() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="label mr-1">{t('lab.s.day', { n: m.day })} · {t('lab.s.market', { n: seed })}</span>
-            <button className="btn-quiet" title={t('lab.s.tipNext')} onClick={() => advance()}><FastForward size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.next')}</button>
-            <button title={t('lab.s.tipPlay')} className="btn-quiet" aria-pressed={playing} onClick={() => setPlaying(p => !p)}>
+            <button data-guide="st-next" className="btn-quiet" title={t('lab.s.tipNext')} onClick={() => advance()}><FastForward size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.next')}</button>
+            <button data-guide="st-play" title={t('lab.s.tipPlay')} className="btn-quiet" aria-pressed={playing} onClick={() => setPlaying(p => !p)}>
               {playing ? <Pause size={16} strokeWidth={1.5} aria-hidden /> : <Play size={16} strokeWidth={1.5} aria-hidden />}{t(playing ? 'lab.s.pause' : 'lab.s.play')}
             </button>
-            <button className="btn-quiet" title={t('lab.s.tipNew')} onClick={newMarket}><RotateCcw size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.newMarket')}</button>
+            <button data-guide="st-new" className="btn-quiet" title={t('lab.s.tipNew')} onClick={newMarket}><RotateCcw size={16} strokeWidth={1.5} aria-hidden />{t('lab.s.newMarket')}</button>
           </div>
         </div>
         <p className="mt-4 flex items-start gap-2 border-t border-line pt-3 text-[14px] text-soft" aria-live="polite">
@@ -128,7 +130,7 @@ export default function LabStocks() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
         {/* market board */}
-        <section aria-labelledby="board" className="hud p-5 sm:p-6">
+        <section aria-labelledby="board" data-guide="st-board" className="hud p-5 sm:p-6">
           <h2 id="board" className="text-[1.45rem] text-ink">{t('lab.s.board')}</h2>
           <div className="mt-3 grid grid-cols-[minmax(0,1fr)_5.5rem_4.5rem] gap-x-3 px-3 sm:grid-cols-[minmax(0,1fr)_5.5rem_4.5rem_4.5rem]" aria-hidden>
             <span className="label">{t('lab.s.company')}</span><span className="label text-right">{t('lab.s.price')}</span>
@@ -155,7 +157,7 @@ export default function LabStocks() {
 
         <div className="space-y-6">
           {/* the selected company: chart and virtual trades */}
-          <section aria-labelledby="co" className="hud p-5 sm:p-6">
+          <section aria-labelledby="co" data-guide="st-company" className="hud p-5 sm:p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 id="co" className="text-[1.45rem] text-ink">{c.name}</h2>
               <span className="num text-[1.45rem] text-ink"><Tick value={m.prices[sel]}>{rupees(m.prices[sel])}</Tick></span>
@@ -165,7 +167,7 @@ export default function LabStocks() {
               <LineChart label={t('lab.s.chart', { name: c.name, n: chart.length })} series={[{ name: c.name, values: chart }]} format={n => `₹ ${Math.round(n)}`} height={150} />
             </div>
             <p className="mt-3 text-[14px] text-soft">{t('lab.s.hold')}: <span className="text-ink">{rupees(values[sel])}</span></p>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div data-guide="st-trade" className="mt-2 flex flex-wrap gap-2">
               {BUY.map(a => <button key={a} className="btn-quiet" onClick={() => buy(a)}>{t('lab.s.buy', { amt: rupees(a) })}</button>)}
               <button className="btn-quiet" disabled={!shares[sel]} aria-describedby={shares[sel] ? undefined : 'sell-why'} onClick={() => sell(0.5)}>{t('lab.s.sellHalf')}</button>
               <button className="btn-quiet" disabled={!shares[sel]} aria-describedby={shares[sel] ? undefined : 'sell-why'} onClick={() => sell(1)}>{t('lab.s.sellAll')}</button>
@@ -179,7 +181,7 @@ export default function LabStocks() {
       <NewsRound m={m} seed={seed} onRelease={releaseNews}
         onScore={(right, of) => { rewarded.current.delete('news'); reward('news', (right / of) * 100, 'news_round', 'news') }} />
 
-      <section aria-labelledby="risk" className="space-y-4">
+      <section aria-labelledby="risk" data-guide="st-lessons" className="space-y-4">
         <div>
           <h2 id="risk" className="text-[1.9rem] text-ink">{t('lab.s.lessons')}</h2>
           <p className="mt-1 text-[15px] text-soft">{t('lab.s.lessonsSub')}</p>

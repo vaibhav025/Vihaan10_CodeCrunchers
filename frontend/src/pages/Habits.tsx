@@ -63,10 +63,10 @@ export default function Habits() {
           <div className="max-w-xl">
             <Label>{t('hb.month')}</Label>
             <h1 className="mt-2 text-[clamp(2rem,4.5vw,3rem)] leading-[1.05]">{t('hb.title')}</h1>
-            <p className="mt-2 text-[16px] leading-relaxed text-[#FFFFFF]/80">{t('hb.sub')}</p>
+            <p className="mt-2 text-[16px] leading-relaxed text-ink/80">{t('hb.sub')}</p>
           </div>
           <div className="flex gap-3">
-            <div className="tile px-5 py-4"><p className="label">{t('hb.saved')}</p><p className="num mt-1 text-[2.6rem] leading-none text-[#FFFFFF]"><CountUp value={total} format={rupees} /></p></div>
+            <div className="tile px-5 py-4"><p className="label">{t('hb.saved')}</p><p className="num mt-1 text-[2.6rem] leading-none text-ink"><CountUp value={total} format={rupees} /></p></div>
             <div className="tile px-5 py-4"><p className="label flex items-center gap-1"><Flame size={12} />{t('home.streak')}</p><p className="num mt-1 text-[2.6rem] leading-none"><CountUp value={streak} /></p></div>
           </div>
         </div>

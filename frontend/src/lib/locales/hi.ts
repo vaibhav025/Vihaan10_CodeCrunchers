@@ -1,10 +1,14 @@
 import uxHi from './ux.hi'
 import labHi from './lab.hi'
 import lab2Hi from './lab2.hi'
+import replayHi from './replay.hi'
+import marketHi from './market.hi'
 
 const hi: Record<string, string> = {
   ...labHi,
   ...lab2Hi,
+  ...replayHi,
+  ...marketHi,
   'vt.starter': 'शुरुआती',
   'vt.foundation': 'नींव निर्माता',
   'vt.steady': 'स्थिर बचतकर्ता',

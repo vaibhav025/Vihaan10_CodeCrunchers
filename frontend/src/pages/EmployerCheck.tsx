@@ -47,7 +47,7 @@ export default function EmployerCheck() {
         <div className="relative z-10 max-w-2xl">
           <Label>80CCD(2)</Label>
           <h1 className="mt-2 text-[clamp(2rem,4.5vw,3rem)] leading-[1.05]">{t('em.title')}</h1>
-          <p className="mt-2 text-[16px] leading-relaxed text-[#FFFFFF]/80">{t('em.sub')}</p>
+          <p className="mt-2 text-[16px] leading-relaxed text-ink/80">{t('em.sub')}</p>
           <Terms keys={['nps', 'ccd']} className="mt-3" />
         </div>
       </section>

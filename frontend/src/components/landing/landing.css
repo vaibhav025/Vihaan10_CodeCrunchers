@@ -1,6 +1,10 @@
 /* Landing: plan card and stats card. Scoped under .lp so app-wide .label/.num stay as they are. */
 :root { --bg: #000; --fg: #fff; --fgrgb: 255,255,255; --ok: #4fa66a; --e: cubic-bezier(.22,1,.36,1); }
-:root[data-theme='light'] { --bg: #371931; --fg: #FFF3E5; --fgrgb: 255,243,229; }
+:root[data-theme='light'] { --bg: #F5F2E6; --fg: #1B2B21; --fgrgb: 27,43,33; --ok: #1F6B40; }
+/* light: cards are paper with a hairline and a soft shadow instead of a glow */
+:root[data-theme='light'] .lp .card { background: #FBF9F1; border-color: rgba(27,43,33,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 24px rgba(27,43,33,.08); }
+:root[data-theme='light'] .lp .label, :root[data-theme='light'] .stat-desc, :root[data-theme='light'] .plan-note { color: #4F6256; }
+:root[data-theme='light'] .plan-num.glow { filter: none; }
 
 .reveal { opacity: 0; transform: translateY(24px); filter: blur(8px);
   transition: opacity .8s var(--e) var(--d, 0s), transform .8s var(--e) var(--d, 0s), filter .8s var(--e) var(--d, 0s); }

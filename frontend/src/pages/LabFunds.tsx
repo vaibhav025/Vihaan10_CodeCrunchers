@@ -19,7 +19,7 @@ function Checkpoint({ id, options, answer, picked, onPick }: { id: string; optio
   const { t } = useI18n()
   const done = picked !== undefined
   return (
-    <div className="mt-5 border-t border-line pt-4">
+    <div data-guide="fn-quiz" className="mt-5 border-t border-line pt-4">
       <p id={`ck-${id}`} className="text-[15px] font-medium text-ink">{t(`lab.f.${id}.q`)}</p>
       <p className="label mt-1">{t('lab.f.pick')}</p>
       <div role="radiogroup" aria-labelledby={`ck-${id}`} className="mt-2.5 grid max-w-2xl gap-2">
@@ -41,7 +41,7 @@ function Checkpoint({ id, options, answer, picked, onPick }: { id: string; optio
 function Section({ id, n, children }: { id: string; n: number; children: ReactNode }) {
   const { t } = useI18n()
   return (
-    <section aria-labelledby={`f-${id}`} className="hud p-5 sm:p-6">
+    <section aria-labelledby={`f-${id}`} data-guide="fn-exp" className="hud p-5 sm:p-6">
       <Label>{t('lab.f.part', { n })}</Label>
       <h2 id={`f-${id}`} className="mt-1.5 text-[1.6rem] leading-tight text-ink">{t(`lab.f.${id}.t`)}</h2>
       <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-soft">{t(`lab.f.${id}.d`)}</p>
@@ -97,7 +97,7 @@ export default function LabFunds() {
       <Terms keys={['sip', 'nav', 'etf']} />
 
       {/* one experiment at a time: where you are, and which ones are answered */}
-      <nav ref={top} aria-label={t('lab.f.stepOf', { n: at + 1 })} className="scroll-mt-28">
+      <nav ref={top} data-guide="fn-steps" aria-label={t('lab.f.stepOf', { n: at + 1 })} className="scroll-mt-28">
         <ol className="grid grid-cols-4 gap-2">
           {ids.map((id, n) => (
             <li key={id}>
@@ -112,7 +112,7 @@ export default function LabFunds() {
       </nav>
 
       {at === 0 && <Section id="fee" n={1}>
-        <div className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
+        <div data-guide="fn-sliders" className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
           <Range label={t('lab.f.monthly')} value={monthly} min={1000} max={20000} step={1000} onChange={setMonthly} format={rupees} />
           <Range label={t('lab.f.activeFee')} value={fee} min={0.5} max={2.5} step={0.1} onChange={setFee} format={v => `${v.toFixed(1)}%`} />
         </div>
@@ -197,7 +197,7 @@ export default function LabFunds() {
         <button type="button" className="btn-quiet" disabled={at === 0} onClick={() => go(at - 1)}>← {t('lab.f.prevExp')}</button>
         <span className="label">{t('lab.f.stepOf', { n: at + 1 })}</span>
         {at < ids.length - 1
-          ? <button type="button" className={picked[ids[at]] !== undefined ? 'btn' : 'btn-quiet'} onClick={() => go(at + 1)}>{t('lab.f.nextExp')} →</button>
+          ? <button type="button" data-guide="fn-next" className={picked[ids[at]] !== undefined ? 'btn' : 'btn-quiet'} onClick={() => go(at + 1)}>{t('lab.f.nextExp')} →</button>
           : answered < ids.length ? <span className="text-[14px] text-soft">{t('lab.f.answerAll')}</span> : <span />}
       </div>
 
