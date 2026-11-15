@@ -8,6 +8,7 @@ import { ScrubText } from '../ui/Scrub'
 import { ArrowUpRight } from '../components/ui/icons'
 import { PlanCard, StatsCard, useReveal } from '../components/landing/Plan'
 import HowItWorks from '../components/landing/HowItWorks'
+import Pricing from '../components/landing/Pricing'
 import { idleAfterPaint } from '../lib/idle'
 import { prefetchNext } from '../routes'
 import { useI18n } from '../lib/i18n'
@@ -77,6 +78,7 @@ export default function Landing() {
       <RoadStory vitality={vitalityFor(saving, TARGET)} state={state} age={age} saving={Math.min(saving, 6000)} onSaving={setSaving} maxSaving={6000} />
 
       <HowItWorks />
+      <Pricing />
 
       <section data-orb className="relative mx-auto mt-24 w-full max-w-[1200px] px-6 pb-16 pt-16 text-center sm:px-12 sm:pt-24">
         <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgb(var(--ink)/0.06),transparent_65%)]" />
